@@ -1,0 +1,70 @@
+{
+    "metadata": {
+        "version": 4.4,
+        "type": "Object",
+        "generator": "Object3D.toJSON"
+    },
+    "geometries": [
+        {
+            "uuid": "DDAEBADC-6D69-41DD-8C8A-01B6BDFE5983",
+            "type": "CircleGeometry",
+            "radius": 150,
+            "segments": 40
+        }
+    ],
+    "materials": [
+        {
+            "uuid": "E4E4976C-5353-43E7-A27F-31D5017A93A6",
+            "type": "MeshPhongMaterial",
+            "color": 10526816,
+            "emissive": 0,
+            "specular": 1118481,
+            "shininess": 30
+        }
+    ],
+    "object": {
+        "uuid": "C64AC45F-D62F-4587-9E1D-14474DF09F19",
+        "type": "Scene",
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "children": [
+            {
+                "uuid": "D598312D-3843-4606-B618-DEFA9CAF9994",
+                "type": "Mesh",
+                "receiveShadow": true,
+                "matrix": [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, -100, 0, 1],
+                "geometry": "DDAEBADC-6D69-41DD-8C8A-01B6BDFE5983",
+                "material": "E4E4976C-5353-43E7-A27F-31D5017A93A6"
+            }, {
+                "uuid": "E628DFCA-E5E4-4A98-A811-D3AFC290D55B",
+                "type": "SpotLight",
+                 "name": "SpotLight1",
+                "castShadow": true,
+                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -150, 400, 200, 1],
+                "color": 16777215,
+                "intensity": 0.8,
+                "distance": 0,
+                "angle": 0.4471975511965976,
+                "decay": 1,
+                "exponent": 30
+            },{
+                "uuid": "1A672081-0A67-4216-A331-16082F38FE74",
+                "type": "SpotLight",
+                "name": "SpotLight2",
+                "castShadow": true,
+                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 200, 400, 200, 1],
+                "color": 16777215,
+                "intensity": 0.1,
+                "distance": 0,
+                "angle": 0.4471975511965976,
+                "decay": 1,
+                "exponent": 30
+            },
+             {
+                "uuid": "6A9DD607-23E8-4D24-B3E7-367635B959E1",
+                "type": "AmbientLight",
+                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+                "color": 10000
+            }
+        ]
+    }
+}

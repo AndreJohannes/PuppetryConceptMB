@@ -42,7 +42,7 @@ public class HTTPServer extends NanoHTTPD {
 		StringBuilder buf = new StringBuilder();
 		InputStream fileStream;
 		try {
-			fileStream = context.getAssets().open(file.toLowerCase().substring(1,file.length()));
+			fileStream = context.getAssets().open(file.substring(1,file.length()));
 			BufferedReader in = new BufferedReader(new InputStreamReader(fileStream, "UTF-8"));
 			String str;
 

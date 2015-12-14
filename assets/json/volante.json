@@ -1,0 +1,34 @@
+{
+    "metadata": {
+        "version": 4.4,
+        "type": "Object",
+        "generator": "Object3D.toJSON"
+    },
+    "geometries": [
+        {
+            "uuid": "43E2FD35-85BB-4BC2-8020-F7F3A2B291DF",
+            "type": "BoxGeometry",
+            "width": 50,
+            "height": 5,
+            "depth": 100
+        }
+    ],
+    "materials": [
+        {
+            "uuid": "89E21A20-A5E4-42B4-9F38-5D425D2C6C19",
+            "type": "MeshPhongMaterial",
+            "color": 4206656,
+            "emissive": 0,
+            "specular": 1118481,
+            "shininess": 30
+        }
+    ],
+    "object": {
+        "uuid": "FC7B10A3-DBEE-4E3E-A34A-E27AE61A9BF6",
+        "type": "Mesh",
+        "name": "volante",
+        "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
+        "geometry": "43E2FD35-85BB-4BC2-8020-F7F3A2B291DF",
+        "material": "89E21A20-A5E4-42B4-9F38-5D425D2C6C19"
+    }
+}
