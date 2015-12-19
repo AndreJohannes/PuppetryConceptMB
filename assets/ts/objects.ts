@@ -21,6 +21,10 @@ module Objects {
             this._centerPoint = point;
             this.mesh.position.set(point.x, point.y, point.z);
         }
+        
+        get centerPoint():THREE.Vector3{
+            return this._centerPoint;    
+        }
 
     }
 
@@ -36,7 +40,7 @@ module Objects {
             //this.scene = scene;
             var cylinder = new THREE.CylinderGeometry(3.5, 3.5, height);
             var material = new THREE.MeshPhongMaterial({
-                emissive: 0x000000
+                emissive: 0x000000,
             });
             this.mesh = new THREE.Mesh(cylinder, material);
             this.mesh.castShadow = true;

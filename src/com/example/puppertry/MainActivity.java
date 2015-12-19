@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.text.format.Formatter;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 public class MainActivity extends Activity implements SensorEventListener {
@@ -36,12 +37,14 @@ public class MainActivity extends Activity implements SensorEventListener {
 	private float[] mfArray = new float[3], acArray = new float[3], otArray = new float[3];
 	private float[] rotationMatrix = new float[9];
 	private float ortX, ortY, ortZ;
-	private static float alpha = 0.5f; 
-	
+	private static float alpha = 0.5f;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
 		mfX = (TextView) findViewById(R.id.MagFieldX);
 		mfY = (TextView) findViewById(R.id.MagFieldY);
@@ -127,11 +130,10 @@ public class MainActivity extends Activity implements SensorEventListener {
 		boolean success = SensorManager.getRotationMatrix(rotationMatrix, null, acArray, mfArray);
 		if (success) {
 			SensorManager.getOrientation(rotationMatrix, otArray);
-			ortX = otArray[0] + alpha *(ortX - otArray[0]);
-			ortY = otArray[1] + alpha *(ortY - otArray[1]);
-			ortZ = otArray[2] + alpha *(ortZ - otArray[2]);
-			webSocketServer
-			.broadcast(String.format(Locale.ENGLISH, "[%f, %f, %f]", ortX, ortY, ortZ));
+			ortX = otArray[0] + (alpha + 0.25f) * (ortX - otArray[0]);
+			ortY = otArray[1] + alpha * (ortY - otArray[1]);
+			ortZ = otArray[2] + alpha * (ortZ - otArray[2]);
+			webSocketServer.broadcast(String.format(Locale.ENGLISH, "[%f, %f, %f]", ortX, ortY, ortZ));
 			otX.setText(String.valueOf(ortX));
 			otY.setText(String.valueOf(ortY));
 			otZ.setText(String.valueOf(ortZ));
