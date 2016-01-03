@@ -25,24 +25,52 @@ module Solver {
             return (new THREE.Vector3(this.rotatedAnchor.x, this.rotatedAnchor.y, this.rotatedAnchor.z));
         }
 
-        public rotateAnchor(theta: number, thetaDot: number, thetaDotDot: number) {
-            var sin = Math.sin(theta);
-            var cos = Math.cos(theta);
-            var x = this.initialAnchor.x * cos + this.initialAnchor.z * sin;
-            var y = this.initialAnchor.y;
-            var z = -this.initialAnchor.x * sin + this.initialAnchor.z * cos;;
-            var xdot = thetaDot * (-this.initialAnchor.x * sin + this.initialAnchor.z * cos);
-            var zdot = thetaDot * (-this.initialAnchor.x * cos - this.initialAnchor.z * sin);
-            var xdotdot = -x * thetaDot * thetaDot + thetaDotDot * xdot;
-            var zdotdot = -z * thetaDot * thetaDot + thetaDotDot * zdot;
+        public rotateAnchor(theta: number, thetaDot: number, thetaDotDot: number,
+            phi: number, phiDot: number, phiDotDot: number,
+            dy: number, dydot: number, dydotdot: number) {
+            var sinTheta = Math.sin(theta);
+            var cosTheta = Math.cos(theta);
+            var sinPhi = Math.sin(-phi);
+            var cosPhi = Math.cos(-phi);
+            var apx = this.initialAnchor.x;
+            var apy = this.initialAnchor.y;
+            var apz = this.initialAnchor.z;
+            var x = apx * cosTheta - apy * sinTheta * sinPhi + apz * cosPhi * sinTheta;
+            var y = apy * cosPhi + apz * sinPhi;
+            var z = -apx * sinTheta - apy * cosTheta * sinPhi + apz * cosTheta * cosPhi;
+            //var RThetaRPhix = (apz * cosPhi - apy * sinPhi) * sinTheta + apx * cosTheta;
+            //var RThetaRPhiy = apz * sinPhi + apy * cosPhi;
+            //var RThetaRPhiz = (-apx * sinTheta) - apy * cosTheta * sinPhi + apz * cosPhi * cosTheta;
+            var RThetaDotRPhix = (-apx * sinTheta) - apy * cosTheta * sinPhi + apz * cosPhi * cosTheta;
+            var RThetaDotRPhiy = 0;
+            var RThetaDotRPhiz = (apy * sinPhi - apz * cosPhi) * sinTheta - apx * cosTheta;
+            var RThetaRPhiDotx = ((-apz * sinPhi) - apy * cosPhi) * sinTheta;
+            var RThetaRPhiDoty = apz * cosPhi - apy * sinPhi;
+            var RThetaRPhiDotz = (-apz * cosTheta * sinPhi) - apy * cosPhi * cosTheta;
+            var RThetaDotRPhiDotx = (-apz * cosTheta * sinPhi) - apy * cosPhi * cosTheta;
+            var RThetaDotRPhiDoty = 0;
+            var RThetaDotRPhiDotz = (apz * sinPhi + apy * cosPhi) * sinTheta;
+            var RThetaDotDotRPhix = (apy * sinPhi - apz * cosPhi) * sinTheta - apx * cosTheta;
+            var RThetaDotDotRPhiy = 0;
+            var RThetaDotDotRPhiz = apx * sinTheta + apy * cosTheta * sinPhi - apz * cosPhi * cosTheta;
+            var RThetaRPhiDotDotx = (apy * sinPhi - apz * cosPhi) * sinTheta;
+            var RThetaRPhiDotDoty = (-apz * sinPhi) - apy * cosPhi;
+            var RThetaRPhiDotDotz = apy * cosTheta * sinPhi - apz * cosPhi * cosTheta;
+
+            var xdot = thetaDot * RThetaDotRPhix + phiDot * RThetaRPhiDotx;
+            var ydot = thetaDot * RThetaDotRPhiy + phiDot * RThetaRPhiDoty;
+            var zdot = thetaDot * RThetaDotRPhiz + phiDot * RThetaRPhiDotz;
+            var xdotdot = RThetaDotRPhix * thetaDotDot + RThetaRPhiDotx * phiDotDot + 2 * RThetaDotRPhiDotx * phiDot * thetaDot + RThetaDotDotRPhix * thetaDot ** 2 + RThetaRPhiDotDotx * phiDot ** 2;
+            var ydotdot = RThetaDotRPhiy * thetaDotDot + RThetaRPhiDoty * phiDotDot + 2 * RThetaDotRPhiDoty * phiDot * thetaDot + RThetaDotDotRPhiy * thetaDot ** 2 + RThetaRPhiDotDoty * phiDot ** 2;
+            var zdotdot = RThetaDotRPhiz * thetaDotDot + RThetaRPhiDotz * phiDotDot + 2 * RThetaDotRPhiDotz * phiDot * thetaDot + RThetaDotDotRPhiz * thetaDot ** 2 + RThetaRPhiDotDotz * phiDot ** 2;
             this.rotatedAnchor.x = x;
-            this.rotatedAnchor.y = y;
+            this.rotatedAnchor.y = y + dy;
             this.rotatedAnchor.z = z;
             this.rotatedAnchor.xdot = xdot;
-            this.rotatedAnchor.ydot = 0;
+            this.rotatedAnchor.ydot = ydot + dydot;
             this.rotatedAnchor.zdot = zdot;
             this.rotatedAnchor.xdotdot = xdotdot;
-            this.rotatedAnchor.ydotdot = 0;
+            this.rotatedAnchor.ydotdot = ydotdot + dydotdot;
             this.rotatedAnchor.zdotdot = zdotdot;
         }
 

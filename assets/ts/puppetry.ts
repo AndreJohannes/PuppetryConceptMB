@@ -15,6 +15,7 @@ class Render {
     private cylinders: Array<Objects.Cylinder> = new Array();
     private spheres: Array<Objects.Sphere> = new Array();
     private body: THREE.Object3D = new THREE.Object3D();
+    private stage: THREE.Object3D = new THREE.Object3D();
     private volante: THREE.Object3D = new THREE.Object3D();
     private stats: Stats;
 
@@ -26,25 +27,32 @@ class Render {
         this.camera.position.y = 200;
 
         var scene = this.scene;
-        scene.add(this.volante);
+        //scene.add(this.volante);
+        scene.add(this.stage);
+        scene.add(this.body);
         var that = this;
         (new THREE.ObjectLoader).load('json/scene.json', function(obj) {
             (<THREE.SpotLight>obj.getObjectByName("SpotLight1")).shadowDarkness = .6;
             (<THREE.SpotLight>obj.getObjectByName("SpotLight2")).shadowDarkness = .3;
-            scene.add(obj);
+            var stage: THREE.Mesh = <THREE.Mesh>(obj.getObjectByName("stage"));
+            var texture = THREE.ImageUtils.loadTexture("textures/floorboards.jpg");
+            stage.material = new THREE.MeshPhongMaterial({ color: 0xffffff, map: texture });
+
+            that.stage.add(obj);
             (new THREE.ObjectLoader).load('json/volante.json', function(obj) {
-                that.volante = obj;
-                that.scene.add(obj);
+                that.volante.add(obj);
+                //that.scene.add(obj);
                 obj.rotation.order = "YZX";
-                that.solver = new Solver.Solver(scene);
+                that.solver = new Solver.Solver(that.body);
             });
+
         });
 
         this.renderer = new THREE.WebGLRenderer();
         this.renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
         this.renderer.setClearColor(0x101010);
-        this.renderer.shadowMapEnabled = true;
-        this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
+        //this.renderer.shadowMapEnabled = true;
+        //this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
     
         // Add fps statistics and trackball control
         $('#envelope').append(this.renderer.domElement);
@@ -87,15 +95,36 @@ window.onload = function() {
     this.render = new Render();
     this.render.animate();
     var render = this.render;
+    var audio = new Audio("music/twist.mp3");
     var connection = new WebSocket('ws://' + window.location.hostname + ':9090', [
         'soap', 'xmpp']);
     connection.onmessage = function(e) {
         var data = JSON.parse(e.data);
-        render.solver.setVolante(data);
-        render.volante.rotation.y = -data[0];
-        render.volante.rotation.z = -data[2];
-        //       mesh.rotation.y = -data[0];
-        //  mesh.rotation.x = -data[1];
-        //  mesh.rotation.z = -data[2];
+        //render.solver.setVolante(data.ort);
+        render.volante.rotation.y = -data.ort[0];
+        render.volante.rotation.x = -data.ort[1];
+        render.volante.rotation.z = -data.ort[2];
+        var mode: Solver.Mode = Solver.Mode.None;
+        for (var command of data.cmds) {
+            switch (command) {
+                case Solver.Commands.JawOpen:
+                    render.solver.openJaw();
+                    break;
+                case Solver.Commands.JawClose:
+                    render.solver.closeJaw();
+                    break;
+                case Solver.Commands.LeftLegTwist:
+                    mode = Solver.Mode.LeftTwist;
+                    break;
+                case Solver.Commands.PlayAudio:
+                    audio.src = "music/twist.mp3";
+                    audio.play();
+                    break;
+                case Solver.Commands.StopAudio:
+                    audio.src = "music/twist.mo3";
+                    break;    
+            }
+        }
+        render.solver.setVolante(data.ort, mode);
     };
 };

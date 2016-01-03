@@ -7,11 +7,12 @@ module Objects {
         private mesh: THREE.Mesh;
         private _centerPoint: THREE.Vector3;
 
-        constructor(scene: THREE.Object3D, radius: number = 5) {
-            var sphere: THREE.SphereGeometry = new THREE.SphereGeometry(radius);
-            var material: THREE.Material = new THREE.MeshPhongMaterial({
-                emissive: 0x000000
-            });
+        constructor(scene: THREE.Object3D, radius: number = 3) {
+            var sphere: THREE.SphereGeometry = new THREE.SphereGeometry(radius, 15, 10);
+            var material: THREE.Material =
+                new THREE.MeshPhongMaterial({
+                    emissive: 0x000000
+                });
             this.mesh = new THREE.Mesh(sphere, material);
             this.mesh.castShadow = true;
             scene.add(this.mesh);
@@ -21,9 +22,9 @@ module Objects {
             this._centerPoint = point;
             this.mesh.position.set(point.x, point.y, point.z);
         }
-        
-        get centerPoint():THREE.Vector3{
-            return this._centerPoint;    
+
+        get centerPoint(): THREE.Vector3 {
+            return this._centerPoint;
         }
 
     }
@@ -38,10 +39,11 @@ module Objects {
 
         constructor(scene: THREE.Object3D, height: number) {
             //this.scene = scene;
-            var cylinder = new THREE.CylinderGeometry(3.5, 3.5, height);
-            var material = new THREE.MeshPhongMaterial({
-                emissive: 0x000000,
-            });
+            var cylinder = new THREE.CylinderGeometry(2.0, 2.0, height, 15, 1);
+            var material =
+                new THREE.MeshPhongMaterial({
+                    emissive: 0x000000,
+                });
             this.mesh = new THREE.Mesh(cylinder, material);
             this.mesh.castShadow = true;
             this.pivot = new THREE.Object3D();

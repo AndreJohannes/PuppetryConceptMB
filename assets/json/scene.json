@@ -31,6 +31,7 @@
                 "uuid": "D598312D-3843-4606-B618-DEFA9CAF9994",
                 "type": "Mesh",
                 "receiveShadow": true,
+                "name": "stage",
                 "matrix": [1, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0, 0, 0, -100, 0, 1],
                 "geometry": "DDAEBADC-6D69-41DD-8C8A-01B6BDFE5983",
                 "material": "E4E4976C-5353-43E7-A27F-31D5017A93A6"
@@ -63,7 +64,7 @@
                 "uuid": "6A9DD607-23E8-4D24-B3E7-367635B959E1",
                 "type": "AmbientLight",
                 "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
-                "color": 10000
+                "color": 1513239
             }
         ]
     }

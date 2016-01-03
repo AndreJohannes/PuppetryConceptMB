@@ -3,8 +3,8 @@ var Objects;
 (function (Objects) {
     var Sphere = (function () {
         function Sphere(scene, radius) {
-            if (radius === void 0) { radius = 5; }
-            var sphere = new THREE.SphereGeometry(radius);
+            if (radius === void 0) { radius = 3; }
+            var sphere = new THREE.SphereGeometry(radius, 15, 10);
             var material = new THREE.MeshPhongMaterial({
                 emissive: 0x000000
             });
@@ -29,7 +29,7 @@ var Objects;
     var Cylinder = (function () {
         function Cylinder(scene, height) {
             //this.scene = scene;
-            var cylinder = new THREE.CylinderGeometry(3.5, 3.5, height);
+            var cylinder = new THREE.CylinderGeometry(2.0, 2.0, height, 15, 1);
             var material = new THREE.MeshPhongMaterial({
                 emissive: 0x000000,
             });

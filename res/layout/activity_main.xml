@@ -8,76 +8,111 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.puppertry.MainActivity" >
 
+    <TableLayout
+        android:id="@+id/tableId"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/btnId1"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:text="Not Used" />
+
+            <Button
+                android:id="@+id/btnId2"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:text="Drop Jaw" />
+
+            <Button
+                android:id="@+id/btnId3"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:text="Not Used" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <ToggleButton
+                android:id="@+id/btnId4"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:textOff="LL Twist"
+                android:textOn="LL Twist"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnId5"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:text="Not Used" />
+
+            <ToggleButton
+                android:id="@+id/btnId6"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:textOff="RL Twist"
+                android:textOn="RL Twist"
+                android:textSize="20sp" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/btnId7"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:text="Not Used" />
+
+            <Button
+                android:id="@+id/btnId8"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:text="Not Used" />
+
+            <Button
+                android:id="@+id/btnId9"
+                android:layout_width="fill_parent"
+                android:layout_height="90dp"
+                android:layout_weight="1"
+                android:background="@drawable/gradient"
+                android:text="Calibrate" />
+        </TableRow>
+    </TableLayout>
+
     <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
         android:orientation="vertical" >
-
-        <TextView
-            android:id="@+id/MagFieldTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:text="Magnetic field:" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/MagFieldX"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
-                android:text="0" />
-
-            <TextView
-                android:id="@+id/MagFieldY"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
-                android:text="0" />
-
-            <TextView
-                android:id="@+id/MagFieldZ"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
-                android:text="0" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/AccTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:text="Acceleration:" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:id="@+id/AccX"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
-                android:text="0" />
-
-            <TextView
-                android:id="@+id/AccY"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
-                android:text="0" />
-
-            <TextView
-                android:id="@+id/AccZ"
-                android:layout_width="90dp"
-                android:layout_height="wrap_content"
-                android:text="0" />
-        </LinearLayout>
 
         <TextView
             android:id="@+id/OrtTag"
@@ -116,7 +151,11 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:text="TextView" />
-
     </LinearLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </TableLayout>
 
 </RelativeLayout>
