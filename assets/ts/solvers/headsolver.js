@@ -1,68 +1,59 @@
 /// <reference path="../three.d.ts" />
 /// <reference path="../solver.ts" />
-
-module Solver {
-
-    enum EyeState {
-        Started,
-        Stop,
-        Fading,
-        Stopped
-    }
-
-    class LocationEye extends THREE.Vector3 {
-
-        private up: THREE.Vector3;
-        private left: THREE.Vector3;
-        private center: THREE.Vector3;
-
-        constructor(center: THREE.Vector3, up: THREE.Vector3, left: THREE.Vector3) {
-            super(center.x, center.y, center.z);
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var Solver;
+(function (Solver) {
+    var EyeState;
+    (function (EyeState) {
+        EyeState[EyeState["Started"] = 0] = "Started";
+        EyeState[EyeState["Stop"] = 1] = "Stop";
+        EyeState[EyeState["Fading"] = 2] = "Fading";
+        EyeState[EyeState["Stopped"] = 3] = "Stopped";
+    })(EyeState || (EyeState = {}));
+    var LocationEye = (function (_super) {
+        __extends(LocationEye, _super);
+        function LocationEye(center, up, left) {
+            _super.call(this, center.x, center.y, center.z);
             this.center = center;
             this.up = up;
             this.left = left;
         }
-
-        setLocation(x: number, y: number) {
+        LocationEye.prototype.setLocation = function (x, y) {
             this.x = this.center.x + x * this.left.x + y * this.up.x;
             this.y = this.center.y + x * this.left.y + y * this.up.y;
             this.z = this.center.z + x * this.left.z + y * this.up.z;
-        }
-
-    }
-
-    export class Head implements RungeKutta.Function {
-
-        public locLeftEye: LocationEye;
-        public locRightEye: LocationEye;
-        private radius: number = 3;
-        private eyeState: EyeState = EyeState.Stopped;
-        private offset: number = 10;
-        private acceleration: number = 0;
-        private alpha: number = 0;
-        private beta: number = 0;
-        private gamma: number = 0;
-
-        constructor() {
+        };
+        return LocationEye;
+    })(THREE.Vector3);
+    var Head = (function () {
+        function Head() {
+            this.radius = 3;
+            this.eyeState = EyeState.Stopped;
+            this.offset = 10;
+            this.acceleration = 0;
+            this.alpha = 0;
+            this.beta = 0;
+            this.gamma = 0;
             var centerLeftEye = new THREE.Vector3(.38320 * 20, 0.04951 * 20, 0.73292 * 20);
             var upLeftEye = new THREE.Vector3(0.967638, 0., -0.252342);
             var leftLeftEye = new THREE.Vector3(0., 0.999691, -0.024849);
             this.locLeftEye = new LocationEye(centerLeftEye, upLeftEye, leftLeftEye);
-
             var centerRightEye = new THREE.Vector3(-.38320 * 20, 0.04951 * 20, 0.73292 * 20);
             var upRightEye = new THREE.Vector3(0.967638, 0., 0.252342);
             var leftRightEye = new THREE.Vector3(0., 0.999691, 0.024849);
             this.locRightEye = new LocationEye(centerRightEye, upRightEye, leftRightEye);
-
             //this._rollEyes(this, 0)();
         }
-
-        public evaluate(state: number[]): number[] {
-            var z: number = state[this.offset];
-            var zdot: number = state[this.offset + 1];
+        Head.prototype.evaluate = function (state) {
+            var z = state[this.offset];
+            var zdot = state[this.offset + 1];
             var k = 1;
             var d = 0.5;
-            var zdotdot: number = -k * z - d * zdot + this.acceleration;
+            var zdotdot = -k * z - d * zdot + this.acceleration;
             var theta = state[this.offset + 2];
             var thetadot = state[this.offset + 3];
             var k = 1;
@@ -74,35 +65,31 @@ module Solver {
             d = 0.5;
             var phidotdot = k * MathUtils.mod(this.gamma - 2 * phi) - d * phidot;
             return [zdot, 0.4 * zdotdot, thetadot, thetadotdot, phidot, phidotdot];
-        }
-
-        public length(): number {
+        };
+        Head.prototype.length = function () {
             return 6;
-        }
-
-        public setAcceleration(accelertion: number) {
+        };
+        Head.prototype.setAcceleration = function (accelertion) {
             this.acceleration = accelertion;
-        }
-
-        public setEulers(alpha: number, beta: number, gamma: number) {
+        };
+        Head.prototype.setEulers = function (alpha, beta, gamma) {
             this.alpha = alpha;
             this.beta = beta;
             this.gamma = gamma;
-        }
-
-        public rollEyes() {
+        };
+        Head.prototype.rollEyes = function () {
             if (this.eyeState != EyeState.Stopped)
                 return;
             this.eyeState = EyeState.Started;
             this._rollEyes(this, 0)();
-        }
-
-        public stopEyes() {
+        };
+        Head.prototype.stopEyes = function () {
             this.eyeState = EyeState.Stop;
-        }
-
-        private _rollEyes(that: Head, time: number, stopTime: number = -1, vertical: boolean = false) {
-            return function() {
+        };
+        Head.prototype._rollEyes = function (that, time, stopTime, vertical) {
+            if (stopTime === void 0) { stopTime = -1; }
+            if (vertical === void 0) { vertical = false; }
+            return function () {
                 var x = that.radius * Math.cos(time);
                 var y = that.radius * Math.sin(time);
                 switch (that.eyeState) {
@@ -131,9 +118,8 @@ module Solver {
                 that.locRightEye.setLocation(vertical ? 0 : x, y);
                 setTimeout(that._rollEyes(that, time + 0.1, stopTime), 17);
             };
-        }
-
-
-    }
-
-}
+        };
+        return Head;
+    })();
+    Solver.Head = Head;
+})(Solver || (Solver = {}));

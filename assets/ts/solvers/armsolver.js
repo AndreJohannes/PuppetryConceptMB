@@ -132,6 +132,9 @@ var Solver;
                 fy - k * y3dot,
                 fz - k * z3dot];
         };
+        Arm.prototype.length = function () {
+            return 18;
+        };
         return Arm;
     })(Solver.Extremity);
     Solver.Arm = Arm;

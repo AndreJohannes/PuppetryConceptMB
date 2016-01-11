@@ -22,7 +22,7 @@ var Solver;
         Extremity.prototype.getRotatedAnchor = function () {
             return (new THREE.Vector3(this.rotatedAnchor.x, this.rotatedAnchor.y, this.rotatedAnchor.z));
         };
-        Extremity.prototype.rotateAnchor = function (theta, thetaDot, thetaDotDot, phi, phiDot, phiDotDot, dy, dydot, dydotdot) {
+        Extremity.prototype.rotateAnchor = function (theta, thetaDot, thetaDotDot, phi, phiDot, phiDotDot, dx, dxdot, dxdotdot, dy, dydot, dydotdot) {
             var sinTheta = Math.sin(theta);
             var cosTheta = Math.cos(theta);
             var sinPhi = Math.sin(-phi);
@@ -57,13 +57,13 @@ var Solver;
             var xdotdot = RThetaDotRPhix * thetaDotDot + RThetaRPhiDotx * phiDotDot + 2 * RThetaDotRPhiDotx * phiDot * thetaDot + RThetaDotDotRPhix * Math.pow(thetaDot, 2) + RThetaRPhiDotDotx * Math.pow(phiDot, 2);
             var ydotdot = RThetaDotRPhiy * thetaDotDot + RThetaRPhiDoty * phiDotDot + 2 * RThetaDotRPhiDoty * phiDot * thetaDot + RThetaDotDotRPhiy * Math.pow(thetaDot, 2) + RThetaRPhiDotDoty * Math.pow(phiDot, 2);
             var zdotdot = RThetaDotRPhiz * thetaDotDot + RThetaRPhiDotz * phiDotDot + 2 * RThetaDotRPhiDotz * phiDot * thetaDot + RThetaDotDotRPhiz * Math.pow(thetaDot, 2) + RThetaRPhiDotDotz * Math.pow(phiDot, 2);
-            this.rotatedAnchor.x = x;
+            this.rotatedAnchor.x = x + dx;
             this.rotatedAnchor.y = y + dy;
             this.rotatedAnchor.z = z;
-            this.rotatedAnchor.xdot = xdot;
+            this.rotatedAnchor.xdot = xdot + dxdot;
             this.rotatedAnchor.ydot = ydot + dydot;
             this.rotatedAnchor.zdot = zdot;
-            this.rotatedAnchor.xdotdot = xdotdot;
+            this.rotatedAnchor.xdotdot = xdotdot + dxdotdot;
             this.rotatedAnchor.ydotdot = ydotdot + dydotdot;
             this.rotatedAnchor.zdotdot = zdotdot;
         };

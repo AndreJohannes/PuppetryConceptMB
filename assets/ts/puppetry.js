@@ -15,7 +15,7 @@ var Render = (function () {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth
             / window.innerHeight, 1, 10000);
         this.camera.position.z = 220;
-        this.camera.position.y = 200;
+        this.camera.position.y = 100;
         var scene = this.scene;
         //scene.add(this.volante);
         scene.add(this.stage);
@@ -82,15 +82,16 @@ window.onload = function () {
         render.volante.rotation.y = -data.ort[0];
         render.volante.rotation.x = -data.ort[1];
         render.volante.rotation.z = -data.ort[2];
+        var solver = (render.solver);
         var mode = Solver.Mode.None;
         for (var _i = 0, _a = data.cmds; _i < _a.length; _i++) {
             var command = _a[_i];
             switch (command) {
                 case Solver.Commands.JawOpen:
-                    render.solver.openJaw();
+                    solver.openJaw();
                     break;
                 case Solver.Commands.JawClose:
-                    render.solver.closeJaw();
+                    solver.closeJaw();
                     break;
                 case Solver.Commands.LeftLegTwist:
                     mode = Solver.Mode.LeftTwist;
@@ -100,10 +101,16 @@ window.onload = function () {
                     audio.play();
                     break;
                 case Solver.Commands.StopAudio:
-                    audio.src = "music/twist.mo3";
+                    audio.src = "music/twist.mp3";
+                    break;
+                case Solver.Commands.RoleEyes:
+                    solver.roleEyes();
+                    break;
+                case Solver.Commands.StopEyes:
+                    solver.roleEyes(false);
                     break;
             }
         }
-        render.solver.setVolante(data.ort, mode);
+        render.solver.setVolante(data.ort, data.acc, mode);
     };
 };

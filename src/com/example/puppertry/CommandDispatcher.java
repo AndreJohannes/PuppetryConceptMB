@@ -11,14 +11,13 @@ import com.example.puppertry.helpers.Commands;
 
 public class CommandDispatcher {
 
-	
-
-	private static String CommandTemplate = "{\"cmds\":%s,\"ort\":[%f,%f,%f,%f]}";
+	private static String CommandTemplate = "{\"cmds\":%s,\"ort\":[%f,%f,%f,%f],\"acc\":[%f,%f,%f]}";
 
 	private final WebSocketServer webSocketServer;
 	private final CommandChain commandChain;
 	private double alpha, beta, gamma;
 	private double linearAcceleration;
+	private double accX, accY, accZ;
 
 	public CommandDispatcher(WebSocketServer webSocketServer) {
 		this.webSocketServer = webSocketServer;
@@ -39,15 +38,15 @@ public class CommandDispatcher {
 		commandString.append("]");
 
 		webSocketServer.broadcast(String.format(Locale.ENGLISH, CommandTemplate, commandString.toString(), alpha, beta,
-				gamma, linearAcceleration));
+				gamma, linearAcceleration, accX, accY, accZ));
 
 	}
 
 	public void setCommand(Commands command) {
 		commandChain.add(command);
 	}
-	
-	public void clearCommand(Commands command){
+
+	public void clearCommand(Commands command) {
 		commandChain.remove(command);
 	}
 
@@ -59,6 +58,12 @@ public class CommandDispatcher {
 
 	public void setLinearAcceleration(double acceleration) {
 		this.linearAcceleration = acceleration;
+	}
+
+	public void setAccelerations(double accX, double accY, double accZ) {
+		this.accX = accX;
+		this.accY = accY;
+		this.accZ = accZ;
 	}
 
 }

@@ -17,7 +17,7 @@ public class CommandChain extends LinkedList<Commands> implements Queue<Commands
 			repopList.clear();
 			return null;
 		}
-		if(command.isOneHitOnly()){
+		if(!command.isOneHitOnly()){
 			repopList.add(command);
 		}
 		return command;

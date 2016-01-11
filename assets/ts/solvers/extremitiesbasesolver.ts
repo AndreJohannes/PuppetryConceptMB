@@ -27,6 +27,7 @@ module Solver {
 
         public rotateAnchor(theta: number, thetaDot: number, thetaDotDot: number,
             phi: number, phiDot: number, phiDotDot: number,
+            dx: number, dxdot: number, dxdotdot: number,
             dy: number, dydot: number, dydotdot: number) {
             var sinTheta = Math.sin(theta);
             var cosTheta = Math.cos(theta);
@@ -63,13 +64,13 @@ module Solver {
             var xdotdot = RThetaDotRPhix * thetaDotDot + RThetaRPhiDotx * phiDotDot + 2 * RThetaDotRPhiDotx * phiDot * thetaDot + RThetaDotDotRPhix * thetaDot ** 2 + RThetaRPhiDotDotx * phiDot ** 2;
             var ydotdot = RThetaDotRPhiy * thetaDotDot + RThetaRPhiDoty * phiDotDot + 2 * RThetaDotRPhiDoty * phiDot * thetaDot + RThetaDotDotRPhiy * thetaDot ** 2 + RThetaRPhiDotDoty * phiDot ** 2;
             var zdotdot = RThetaDotRPhiz * thetaDotDot + RThetaRPhiDotz * phiDotDot + 2 * RThetaDotRPhiDotz * phiDot * thetaDot + RThetaDotDotRPhiz * thetaDot ** 2 + RThetaRPhiDotDotz * phiDot ** 2;
-            this.rotatedAnchor.x = x;
+            this.rotatedAnchor.x = x + dx;
             this.rotatedAnchor.y = y + dy;
             this.rotatedAnchor.z = z;
-            this.rotatedAnchor.xdot = xdot;
+            this.rotatedAnchor.xdot = xdot + dxdot;
             this.rotatedAnchor.ydot = ydot + dydot;
             this.rotatedAnchor.zdot = zdot;
-            this.rotatedAnchor.xdotdot = xdotdot;
+            this.rotatedAnchor.xdotdot = xdotdot + dxdotdot;
             this.rotatedAnchor.ydotdot = ydotdot + dydotdot;
             this.rotatedAnchor.zdotdot = zdotdot;
         }
@@ -104,7 +105,7 @@ module Solver {
 
         abstract evaluate(state: number[]): number[];
 
-
+        abstract length(): number;
 
     }
 

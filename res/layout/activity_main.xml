@@ -17,13 +17,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <Button
+            <ToggleButton
                 android:id="@+id/btnId1"
                 android:layout_width="fill_parent"
                 android:layout_height="90dp"
+                android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
-                android:text="Not Used" />
+                android:textOff="Roll Eyes"
+                android:textOn="Stop Eyes"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/btnId2"
@@ -50,6 +53,7 @@
                 android:id="@+id/btnId4"
                 android:layout_width="fill_parent"
                 android:layout_height="90dp"
+                android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
                 android:textOff="LL Twist"
@@ -68,6 +72,7 @@
                 android:id="@+id/btnId6"
                 android:layout_width="fill_parent"
                 android:layout_height="90dp"
+                android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
                 android:textOff="RL Twist"
@@ -87,13 +92,16 @@
                 android:background="@drawable/gradient"
                 android:text="Not Used" />
 
-            <Button
+            <ToggleButton
                 android:id="@+id/btnId8"
                 android:layout_width="fill_parent"
                 android:layout_height="90dp"
+                android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
-                android:text="Not Used" />
+                android:textOff="Play Song"
+                android:textOn="Stop Song"
+                android:textSize="20sp" />
 
             <Button
                 android:id="@+id/btnId9"
@@ -113,6 +121,14 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:orientation="vertical" >
+
+        <SeekBar
+            android:id="@+id/seekBar1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="200"
+            android:progress="100"
+            android:rotation="0" />
 
         <TextView
             android:id="@+id/OrtTag"
@@ -155,7 +171,9 @@
 
     <TableLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" >
     </TableLayout>
 
 </RelativeLayout>

@@ -12,11 +12,16 @@ var Solver;
     var Body = (function () {
         function Body() {
             this.torso = new Solver.Torso();
+            this.head = new Solver.Head();
             this.extremeties = {};
-            this.extremeties[Extremeties.ARM_RIGHT.toString()] = new Solver.Arm(6); // TODO: the values should not be hard coded
-            this.extremeties[Extremeties.ARM_LEFT.toString()] = new Solver.Arm(24);
-            this.extremeties[Extremeties.LEG_RIGHT.toString()] = new Solver.Leg(42);
-            this.extremeties[Extremeties.LEG_LEFT.toString()] = new Solver.Leg(60);
+            var offset = this.torso.length() + this.head.length();
+            this.extremeties[Extremeties.ARM_RIGHT.toString()] = new Solver.Arm(offset);
+            offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
+            this.extremeties[Extremeties.ARM_LEFT.toString()] = new Solver.Arm(offset);
+            offset += this.extremeties[Extremeties.ARM_LEFT.toString()].length();
+            this.extremeties[Extremeties.LEG_RIGHT.toString()] = new Solver.Leg(offset);
+            offset += this.extremeties[Extremeties.LEG_RIGHT.toString()].length();
+            this.extremeties[Extremeties.LEG_LEFT.toString()] = new Solver.Leg(offset); //offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
         }
         Body.prototype.evaluate = function (state) {
             var ret = this.torso.evaluate(state);
@@ -29,16 +34,30 @@ var Solver;
             var y = state[4];
             var ydot = state[5];
             var ydotdot = ret[5];
+            var x = state[6];
+            var xdot = state[7];
+            var xdotdot = ret[7];
+            this.head.setAcceleration(ydotdot);
+            ret = ret.concat(this.head.evaluate(state));
             for (var entry in this.extremeties) {
-                this.extremeties[entry].rotateAnchor(theta, thetaDot, thetaDotDot, phi, phiDot, phiDotDot, y, ydot, ydotdot);
+                this.extremeties[entry].rotateAnchor(theta, thetaDot, thetaDotDot, phi, phiDot, phiDotDot, x, xdot, xdotdot, y, ydot, ydotdot);
                 ret = ret.concat(this.extremeties[entry].evaluate(state));
             }
             return ret;
         };
-        Body.prototype.setEulersAndAcceleration = function (alpha, beta, gamma, acceleration, mode) {
-            this.torso.setAlphaBetaAndForce(alpha, beta, acceleration);
-            var sin = Math.sin(alpha);
-            var cos = Math.cos(alpha);
+        Body.prototype.length = function () {
+            var retValue = this.torso.length() + this.head.length();
+            for (var entry in this.extremeties) {
+                retValue += this.extremeties[entry].length();
+            }
+            return retValue;
+        };
+        Body.prototype.setEulersAndAccelerations = function (alpha, beta, gamma, accelX, accelY, accelZ, mode) {
+            this.head.setEulers(alpha, beta, gamma);
+            this.torso.setEulers(alpha, beta, gamma);
+            this.torso.setForces(accelX, accelY, accelZ);
+            var sin = Math.sin(0 * alpha);
+            var cos = Math.cos(0 * alpha);
             var tilt = Math.sin(gamma);
             switch (mode) {
                 case Solver.Mode.LeftTwist:
@@ -57,10 +76,10 @@ var Solver;
                             height = 50 * tilt;
                         if (entry == Extremeties.ARM_LEFT)
                             height = -50 * tilt;
-                        if (entry == Extremeties.LEG_RIGHT)
-                            height = Math.max(-30 * tilt, 0);
-                        if (entry == Extremeties.LEG_LEFT)
-                            height = Math.max(30 * tilt, 0);
+                        //if (entry == Extremeties.LEG_RIGHT)
+                        //    height = Math.max(-30 * tilt, 0);
+                        //if (entry == Extremeties.LEG_LEFT)
+                        //    height = Math.max(30 * tilt, 0);
                         this.extremeties[entry].rotateSuspension(sin, cos, height);
                     }
             }

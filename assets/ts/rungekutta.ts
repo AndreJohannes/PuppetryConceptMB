@@ -4,6 +4,7 @@ module RungeKutta {
 
         evaluate(state: number[]): number[];
 
+        length(): number;
     }
 
     export interface Solver {
@@ -24,7 +25,7 @@ module RungeKutta {
             var k3: number[] = this.function.evaluate(this.add(state, this.scale(k2, stepSize / 2.0)));
             var k4: number[] = this.function.evaluate(this.add(state, this.scale(k3, stepSize)));
 
-            return this.add(state,this.scale(this.add(this.scale(this.add(k2, k3), 2.0), this.add(k1, k4)), stepSize / 6.0));
+            return this.add(state, this.scale(this.add(this.scale(this.add(k2, k3), 2.0), this.add(k1, k4)), stepSize / 6.0));
         }
 
         private add(a: number[], b: number[]): number[] {

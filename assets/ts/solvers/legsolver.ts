@@ -138,6 +138,10 @@ module Solver {
                 fy - k * y3dot,
                 fz - k * z3dot];
         }
+        
+        public length(): number {
+            return 18;
+        }
 
     }
 

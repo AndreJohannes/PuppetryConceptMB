@@ -20,7 +20,7 @@ public class HTTPServer extends NanoHTTPD {
 	private static HTTPServer instance = null;
 	public static final String MIME_PLAINTEXT = "text/plain", MIME_HTML = "text/html",
 			MIME_JS = "application/javascript", MIME_CSS = "text/css", MIME_JPG = "image/jpg",
-			MIME_DEFAULT_BINARY = "application/octet-stream", MIME_XML = "text/xml";
+			MIME_DEFAULT_BINARY = "application/octet-stream", MIME_XML = "text/xml", MIME_AUDIO = "audio/mpeg";
 
 	public static HTTPServer getInstance(Context context) {
 		if (instance == null)
@@ -44,13 +44,24 @@ public class HTTPServer extends NanoHTTPD {
 			try {
 				mbuffer = context.getAssets().open(uriString.substring(1));
 				return newChunkedResponse(NanoHTTPD.Response.Status.OK, MIME_JPG, mbuffer);
-				
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			// HTTP_OK = "200 OK" or HTTP_OK = Status.OK;(check comments)
+		}else if(uriString.contains(".mp3")) {
+			InputStream mbuffer;
+			try {
+				mbuffer = context.getAssets().open(uriString.substring(1));
+				return newChunkedResponse(NanoHTTPD.Response.Status.OK, MIME_AUDIO, mbuffer);
+
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
+			// HTTP_OK = "200 OK" or HTTP_OK = Status.OK;(check comments)
+		}
 
 		URI uri = URI.create(uriString);
 		String msg = getStringOfFile(uri.getPath());

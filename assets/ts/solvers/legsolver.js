@@ -132,6 +132,9 @@ var Solver;
                 fy - k * y3dot,
                 fz - k * z3dot];
         };
+        Leg.prototype.length = function () {
+            return 18;
+        };
         return Leg;
     })(Solver.Extremity);
     Solver.Leg = Leg;
