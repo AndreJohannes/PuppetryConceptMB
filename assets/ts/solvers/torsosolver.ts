@@ -27,14 +27,14 @@ module Solver {
             k = 1; d = 0.5;
             var phidotdot = k * MathUtils.mod(this.beta - phi) - d * phidot;
             k = z > 0 ? .5 : 3; d = 0.5;
-            var force = MathUtils.tanh(- k * z + this.force.z);
+            var force = 3 * MathUtils.tanh((- k * z + this.force.z) / 2);
             var zdotdot = force - d * zdot;
             k = 1; d = 0.5;
             force = MathUtils.tanh(- k * x + this.force.x);
             var xdotdot = force - d * xdot;
             k = 1; d = 0.5;
             force = MathUtils.tanh(- k * y + this.force.y);
-            var ydotdot = force - d * ydot;
+            var ydotdot = (force - d * ydot);
 
             return [thetadot, thetadotdot, phidot, phidotdot, zdot, zdotdot, xdot, xdotdot, ydot, ydotdot];
         }

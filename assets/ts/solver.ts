@@ -22,6 +22,27 @@ module Solver {
 
     class FallbackModel {
 
+        constructor() {
+            this.applyOffset(this.body, this.offset);
+            this.applyOffset(this.left_arm, this.offset);
+            this.applyOffset(this.right_arm, this.offset);
+            this.applyOffset(this.left_leg, this.offset);
+            this.applyOffset(this.right_leg, this.offset);
+        }
+
+        private applyOffset(area, offset: number[]) {
+            for (var key in area) {
+                if (area.hasOwnProperty(key)) {
+                    var point: number[] = area[key];
+                    for (var i = 0; i < 3; i++) {
+                        point[i] -= offset[i];
+                    }
+                }
+            }
+        }
+
+        offset = [0, 40, 0];
+
         body = {
             "head": [0, 87, 0],
             "coxis": [0, 0, 0],
@@ -95,11 +116,12 @@ module Solver {
 
     export class Solver {
 
-        private body: Body = new Body();
+        private bodySolver: Body = new Body();
+        private body: THREE.Object3D;
         private torso: THREE.Object3D;
         private head: THREE.Object3D;
         private jaw: THREE.Object3D;
-        private rkSolver: RungeKutta.Solver = new RungeKutta.RungeKuttaSolver4th(this.body);
+        private rkSolver: RungeKutta.Solver = new RungeKutta.RungeKuttaSolver4th(this.bodySolver);
         private state: Array<number>;
         private bonesAndJoint: BonesAndJoints;
         private time: number = 0;
@@ -110,6 +132,7 @@ module Solver {
 
         private dt = .01;
         public solve() {
+            //return;
             this.state = this.rkSolver.solve(this.state, 0.01);
             this.state = this.rkSolver.solve(this.state, 0.01);
             this.state = this.rkSolver.solve(this.state, 0.01);
@@ -142,17 +165,17 @@ module Solver {
             this.torso.position.x = this.state[6];
             this.torso.position.z = this.state[8];
 
-            this.head.position.y = 87 + this.state[10];
+            this.head.position.y = 47 + this.state[10];
             this.head.rotation.x = this.state[2];
             this.head.rotation.y = this.state[12];
             this.head.rotation.z = this.state[14];
-            this.bonesAndJoint.left_eye.centerPoint = this.body.head.locLeftEye;
-            this.bonesAndJoint.right_eye.centerPoint = this.body.head.locRightEye;
+            this.bonesAndJoint.left_eye.centerPoint = this.bodySolver.head.locLeftEye;
+            this.bonesAndJoint.right_eye.centerPoint = this.bodySolver.head.locRightEye;
 
             var offset = 16;
             this.bonesAndJoint.right_elbow.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.right_wrist.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
-            var arm: Extremity = this.body.extremeties[Extremeties.ARM_RIGHT.toString()];
+            var arm: Extremity = this.bodySolver.extremeties[Extremeties.ARM_RIGHT.toString()];
             this.bonesAndJoint.right_upper_arm.startPoint = arm.getRotatedAnchor();
             this.bonesAndJoint.right_upper_arm.endPoint = this.bonesAndJoint.right_elbow.centerPoint;
             this.bonesAndJoint.right_lower_arm.startPoint = this.bonesAndJoint.right_elbow.centerPoint;
@@ -161,7 +184,7 @@ module Solver {
             offset = offset + 18;
             this.bonesAndJoint.left_elbow.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.left_wrist.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
-            var arm: Extremity = this.body.extremeties[Extremeties.ARM_LEFT.toString()];
+            var arm: Extremity = this.bodySolver.extremeties[Extremeties.ARM_LEFT.toString()];
             this.bonesAndJoint.left_upper_arm.startPoint = arm.getRotatedAnchor();
             this.bonesAndJoint.left_upper_arm.endPoint = this.bonesAndJoint.left_elbow.centerPoint;
             this.bonesAndJoint.left_lower_arm.startPoint = this.bonesAndJoint.left_elbow.centerPoint;
@@ -170,7 +193,7 @@ module Solver {
             offset = offset + 18;
             this.bonesAndJoint.right_knee.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.right_ankle.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
-            this.bonesAndJoint.right_thigh.startPoint = this.body.extremeties[Extremeties.LEG_RIGHT.toString()].getRotatedAnchor();
+            this.bonesAndJoint.right_thigh.startPoint = this.bodySolver.extremeties[Extremeties.LEG_RIGHT.toString()].getRotatedAnchor();
             this.bonesAndJoint.right_thigh.endPoint = this.bonesAndJoint.right_knee.centerPoint;
             this.bonesAndJoint.right_shin.startPoint = this.bonesAndJoint.right_knee.centerPoint;
             this.bonesAndJoint.right_shin.endPoint = this.bonesAndJoint.right_ankle.centerPoint;
@@ -178,17 +201,17 @@ module Solver {
             offset = offset + 18;
             this.bonesAndJoint.left_knee.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.left_ankle.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
-            this.bonesAndJoint.left_thigh.startPoint = this.body.extremeties[Extremeties.LEG_LEFT.toString()].getRotatedAnchor();
+            this.bonesAndJoint.left_thigh.startPoint = this.bodySolver.extremeties[Extremeties.LEG_LEFT.toString()].getRotatedAnchor();
             this.bonesAndJoint.left_thigh.endPoint = this.bonesAndJoint.left_knee.centerPoint;
             this.bonesAndJoint.left_shin.startPoint = this.bonesAndJoint.left_knee.centerPoint;
             this.bonesAndJoint.left_shin.endPoint = this.bonesAndJoint.left_ankle.centerPoint;
 
             this.time += this.dt;
-            
+
         }
 
         public setVolante(orientation: number[], accelerations: number[], mode: Mode) {
-            this.body.setEulersAndAccelerations(-orientation[0], -orientation[1],
+            this.bodySolver.setEulersAndAccelerations(-orientation[0], -orientation[1],
                 -orientation[2], accelerations[0], accelerations[1], orientation[3], mode);
         }
 
@@ -206,9 +229,9 @@ module Solver {
 
         public roleEyes(start: boolean = true) {
             if (start == true)
-                this.body.head.rollEyes();
+                this.bodySolver.head.rollEyes();
             else
-                this.body.head.stopEyes();
+                this.bodySolver.head.stopEyes();
         }
 
         private addModel(scene: THREE.Object3D, model: FallbackModel) {
@@ -220,100 +243,78 @@ module Solver {
             this.state = this.state.concat(model.right_leg.knee).concat(threeZeros).concat(model.right_leg.ankle).concat(threeZeros).concat(model.right_leg.suspension).concat(threeZeros);
             this.state = this.state.concat(model.left_leg.knee).concat(threeZeros).concat(model.left_leg.ankle).concat(threeZeros).concat(model.left_leg.suspension).concat(threeZeros);
 
-            this.body.setInitialSuspension(Extremeties.ARM_RIGHT, [-25, 120, 60]);
-            this.body.setInitialSuspension(Extremeties.ARM_LEFT, [25, 120, 60]);
-            this.body.setInitialSuspension(Extremeties.LEG_RIGHT, [-65, 130, 15]);
-            this.body.setInitialSuspension(Extremeties.LEG_LEFT, [65, 130, 15]);
+            this.bodySolver.setInitialSuspension(Extremeties.ARM_RIGHT, [-25, 80, 60]);
+            this.bodySolver.setInitialSuspension(Extremeties.ARM_LEFT, [25, 80, 60]);
+            this.bodySolver.setInitialSuspension(Extremeties.LEG_RIGHT, [-65, 90, 15]);
+            this.bodySolver.setInitialSuspension(Extremeties.LEG_LEFT, [65, 90, 15]);
 
-            this.body.setInitialAnchor(Extremeties.ARM_RIGHT, model.body.right_shoulder);
-            this.body.setInitialAnchor(Extremeties.ARM_LEFT, model.body.left_shoulder);
-            this.body.setInitialAnchor(Extremeties.LEG_RIGHT, model.body.right_pelvis);
-            this.body.setInitialAnchor(Extremeties.LEG_LEFT, model.body.left_pelvis);
+            this.bodySolver.setInitialAnchor(Extremeties.ARM_RIGHT, model.body.right_shoulder);
+            this.bodySolver.setInitialAnchor(Extremeties.ARM_LEFT, model.body.left_shoulder);
+            this.bodySolver.setInitialAnchor(Extremeties.LEG_RIGHT, model.body.right_pelvis);
+            this.bodySolver.setInitialAnchor(Extremeties.LEG_LEFT, model.body.left_pelvis);
 
-            this.body.setNominals(Extremeties.ARM_RIGHT, [this.distance(model.body.right_shoulder, model.right_arm.elbow), this.distance(model.right_arm.elbow, model.right_arm.wrist), this.distance(model.right_arm.wrist, model.right_arm.suspension)]);
-            this.body.setNominals(Extremeties.ARM_LEFT, [this.distance(model.body.left_shoulder, model.left_arm.elbow), this.distance(model.left_arm.elbow, model.left_arm.wrist), this.distance(model.left_arm.wrist, model.left_arm.suspension)]);
-            this.body.setNominals(Extremeties.LEG_RIGHT, [this.distance(model.body.right_pelvis, model.right_leg.knee), this.distance(model.right_leg.knee, model.right_leg.ankle), this.distance(model.right_leg.knee, model.right_leg.suspension)]);
-            this.body.setNominals(Extremeties.LEG_LEFT, [this.distance(model.body.left_pelvis, model.left_leg.knee), this.distance(model.left_leg.knee, model.left_leg.ankle), this.distance(model.left_leg.knee, model.left_leg.suspension)]);
+            this.bodySolver.setNominals(Extremeties.ARM_RIGHT, [this.distance(model.body.right_shoulder, model.right_arm.elbow), this.distance(model.right_arm.elbow, model.right_arm.wrist), this.distance(model.right_arm.wrist, model.right_arm.suspension)]);
+            this.bodySolver.setNominals(Extremeties.ARM_LEFT, [this.distance(model.body.left_shoulder, model.left_arm.elbow), this.distance(model.left_arm.elbow, model.left_arm.wrist), this.distance(model.left_arm.wrist, model.left_arm.suspension)]);
+            this.bodySolver.setNominals(Extremeties.LEG_RIGHT, [this.distance(model.body.right_pelvis, model.right_leg.knee), this.distance(model.right_leg.knee, model.right_leg.ankle), this.distance(model.right_leg.knee, model.right_leg.suspension)]);
+            this.bodySolver.setNominals(Extremeties.LEG_LEFT, [this.distance(model.body.left_pelvis, model.left_leg.knee), this.distance(model.left_leg.knee, model.left_leg.ankle), this.distance(model.left_leg.knee, model.left_leg.suspension)]);
 
-            this.torso = new THREE.Object3D(); scene.add(this.torso); this.torso.rotation.order = 'ZYX';
+            this.body = new THREE.Object3D(); scene.add(this.body);this.body.position.y= 140;
+            this.torso = new THREE.Object3D(); this.body.add(this.torso); this.torso.rotation.order = 'YXZ';// Means Y last
             this.head = new THREE.Object3D(); this.torso.add(this.head); this.head.rotation.order = 'ZYX';
             this.bonesAndJoint = new BonesAndJoints();
             this.loadTorso(this.torso, this.head, this);
 
             this.bonesAndJoint.left_eye = new Objects.Sphere(this.head);
             this.bonesAndJoint.right_eye = new Objects.Sphere(this.head);
-            this.bonesAndJoint.left_eye.centerPoint = this.body.head.locLeftEye;
-            this.bonesAndJoint.right_eye.centerPoint = this.body.head.locRightEye;
-            //this.bonesAndJoint.head = new Objects.Sphere(this.torso, 14);
-            //this.bonesAndJoint.head.centerPoint = new THREE.Vector3(model.body.head[0], model.body.head[1], model.body.head[2]);
-            //this.bonesAndJoint.coxis = new Objects.Sphere(this.torso);
-            //this.bonesAndJoint.coxis.centerPoint = new THREE.Vector3(model.body.coxis[0], model.body.coxis[1], model.body.coxis[2]);
-            //this.bonesAndJoint.neck = new Objects.Sphere(this.torso);
-            //this.bonesAndJoint.neck.centerPoint = new THREE.Vector3(model.body.neck[0], model.body.neck[1], model.body.neck[2]);
-            //this.bonesAndJoint.left_shoulder = new Objects.Sphere(this.torso);
-            //this.bonesAndJoint.left_shoulder.centerPoint = new THREE.Vector3(model.body.left_shoulder[0], model.body.left_shoulder[1], model.body.left_shoulder[2]);
-            //this.bonesAndJoint.right_shoulder = new Objects.Sphere(this.torso);
-            //this.bonesAndJoint.right_shoulder.centerPoint = new THREE.Vector3(model.body.right_shoulder[0], model.body.right_shoulder[1], model.body.right_shoulder[2]);
-            //this.bonesAndJoint.left_hip = new Objects.Sphere(this.torso);
-            //this.bonesAndJoint.left_hip.centerPoint = new THREE.Vector3(model.body.left_pelvis[0], model.body.left_pelvis[1], model.body.left_pelvis[2]);
-            //this.bonesAndJoint.right_hip = new Objects.Sphere(this.torso);
-            //this.bonesAndJoint.right_hip.centerPoint = new THREE.Vector3(model.body.right_pelvis[0], model.body.right_pelvis[1], model.body.right_pelvis[2]);
-            //this.bonesAndJoint.spine = new Objects.Cylinder(this.torso, this.distance(model.body.coxis, model.body.neck));
-            //this.bonesAndJoint.spine.startPoint = new THREE.Vector3(model.body.coxis[0], model.body.coxis[1], model.body.coxis[2]);
-            //this.bonesAndJoint.spine.endPoint = new THREE.Vector3(model.body.neck[0], model.body.neck[1], model.body.neck[2]);
-            //this.bonesAndJoint.collar = new Objects.Cylinder(this.torso, this.distance(model.body.left_shoulder, model.body.right_shoulder));
-            //this.bonesAndJoint.collar.startPoint = new THREE.Vector3(model.body.left_shoulder[0], model.body.left_shoulder[1], model.body.left_shoulder[2]);
-            //this.bonesAndJoint.collar.endPoint = new THREE.Vector3(model.body.right_shoulder[0], model.body.right_shoulder[1], model.body.right_shoulder[2]);
-            //this.bonesAndJoint.pelvis = new Objects.Cylinder(this.torso, this.distance(model.body.left_pelvis, model.body.right_pelvis));
-            //this.bonesAndJoint.pelvis.startPoint = new THREE.Vector3(model.body.left_pelvis[0], model.body.left_pelvis[1], model.body.left_pelvis[2]);
-            //this.bonesAndJoint.pelvis.endPoint = new THREE.Vector3(model.body.right_pelvis[0], model.body.right_pelvis[1], model.body.right_pelvis[2]);
+            this.bonesAndJoint.left_eye.centerPoint = this.bodySolver.head.locLeftEye;
+            this.bonesAndJoint.right_eye.centerPoint = this.bodySolver.head.locRightEye;
 
-            this.bonesAndJoint.left_elbow = new Objects.Sphere(scene);
+            this.bonesAndJoint.left_elbow = new Objects.Sphere(this.body);
             this.bonesAndJoint.left_elbow.centerPoint = new THREE.Vector3(model.left_arm.elbow[0], model.left_arm.elbow[1], model.left_arm.elbow[2]);
-            this.bonesAndJoint.left_wrist = new Objects.Sphere(scene);
+            this.bonesAndJoint.left_wrist = new Objects.Sphere(this.body);
             this.bonesAndJoint.left_wrist.centerPoint = new THREE.Vector3(model.left_arm.wrist[0], model.left_arm.wrist[1], model.left_arm.wrist[2]);
             var anchor = new THREE.Vector3(model.body.left_shoulder[0], model.body.left_shoulder[1], model.body.left_shoulder[2]);
-            this.bonesAndJoint.left_upper_arm = new Objects.Cylinder(scene, this.distance(anchor.toArray(), model.left_arm.elbow));
+            this.bonesAndJoint.left_upper_arm = new Objects.Cylinder(this.body, this.distance(anchor.toArray(), model.left_arm.elbow));
             this.bonesAndJoint.left_upper_arm.startPoint = anchor;
             this.bonesAndJoint.left_upper_arm.endPoint = this.bonesAndJoint.left_elbow.centerPoint;
-            this.bonesAndJoint.left_lower_arm = new Objects.Cylinder(scene, this.distance(model.left_arm.wrist, model.left_arm.elbow));
+            this.bonesAndJoint.left_lower_arm = new Objects.Cylinder(this.body, this.distance(model.left_arm.wrist, model.left_arm.elbow));
             this.bonesAndJoint.left_lower_arm.startPoint = this.bonesAndJoint.left_wrist.centerPoint;
             this.bonesAndJoint.left_lower_arm.endPoint = this.bonesAndJoint.left_elbow.centerPoint;
 
-            this.bonesAndJoint.right_elbow = new Objects.Sphere(scene);
+            this.bonesAndJoint.right_elbow = new Objects.Sphere(this.body);
             this.bonesAndJoint.right_elbow.centerPoint = new THREE.Vector3(model.right_arm.elbow[0], model.right_arm.elbow[1], model.right_arm.elbow[2]);
-            this.bonesAndJoint.right_wrist = new Objects.Sphere(scene);
+            this.bonesAndJoint.right_wrist = new Objects.Sphere(this.body);
             this.bonesAndJoint.right_wrist.centerPoint = new THREE.Vector3(model.right_arm.wrist[0], model.right_arm.wrist[1], model.right_arm.wrist[2]);
             var anchor = new THREE.Vector3(model.body.right_shoulder[0], model.body.right_shoulder[1], model.body.right_shoulder[2]);
-            this.bonesAndJoint.right_upper_arm = new Objects.Cylinder(scene, this.distance(anchor.toArray(), model.right_arm.elbow));
+            this.bonesAndJoint.right_upper_arm = new Objects.Cylinder(this.body, this.distance(anchor.toArray(), model.right_arm.elbow));
             this.bonesAndJoint.right_upper_arm.startPoint = anchor;
             this.bonesAndJoint.right_upper_arm.endPoint = this.bonesAndJoint.right_elbow.centerPoint;
-            this.bonesAndJoint.right_lower_arm = new Objects.Cylinder(scene, this.distance(model.right_arm.wrist, model.right_arm.elbow));
+            this.bonesAndJoint.right_lower_arm = new Objects.Cylinder(this.body, this.distance(model.right_arm.wrist, model.right_arm.elbow));
             this.bonesAndJoint.right_lower_arm.startPoint = this.bonesAndJoint.right_wrist.centerPoint;
             this.bonesAndJoint.right_lower_arm.endPoint = this.bonesAndJoint.right_elbow.centerPoint;
 
-            this.bonesAndJoint.left_knee = new Objects.Sphere(scene);
+            this.bonesAndJoint.left_knee = new Objects.Sphere(this.body);
             this.bonesAndJoint.left_knee.centerPoint = new THREE.Vector3(model.left_leg.knee[0], model.left_leg.knee[1], model.left_leg.knee[2]);
-            this.bonesAndJoint.left_ankle = new Objects.Sphere(scene);
+            this.bonesAndJoint.left_ankle = new Objects.Sphere(this.body);
             this.bonesAndJoint.left_ankle.centerPoint = new THREE.Vector3(model.left_leg.ankle[0], model.left_leg.ankle[1], model.left_leg.ankle[2]);
             var anchor = new THREE.Vector3(model.body.left_pelvis[0], model.body.left_pelvis[1], model.body.left_pelvis[2]);
-            this.bonesAndJoint.left_thigh = new Objects.Cylinder(scene, this.distance(model.left_leg.knee, anchor.toArray()));
+            this.bonesAndJoint.left_thigh = new Objects.Cylinder(this.body, this.distance(model.left_leg.knee, anchor.toArray()));
             this.bonesAndJoint.left_thigh.startPoint = anchor;
             this.bonesAndJoint.left_thigh.endPoint = this.bonesAndJoint.left_knee.centerPoint;
-            this.bonesAndJoint.left_shin = new Objects.Cylinder(scene, this.distance(model.left_leg.knee, model.left_leg.ankle));
+            this.bonesAndJoint.left_shin = new Objects.Cylinder(this.body, this.distance(model.left_leg.knee, model.left_leg.ankle));
             this.bonesAndJoint.left_shin.startPoint = this.bonesAndJoint.left_ankle.centerPoint;
             this.bonesAndJoint.left_shin.endPoint = this.bonesAndJoint.left_knee.centerPoint;
 
-            this.bonesAndJoint.right_knee = new Objects.Sphere(scene);
+            this.bonesAndJoint.right_knee = new Objects.Sphere(this.body);
             this.bonesAndJoint.right_knee.centerPoint = new THREE.Vector3(model.right_leg.knee[0], model.right_leg.knee[1], model.right_leg.knee[2]);
-            this.bonesAndJoint.right_ankle = new Objects.Sphere(scene);
+            this.bonesAndJoint.right_ankle = new Objects.Sphere(this.body);
             this.bonesAndJoint.right_ankle.centerPoint = new THREE.Vector3(model.right_leg.ankle[0], model.right_leg.ankle[1], model.right_leg.ankle[2]);
 
             var anchor = new THREE.Vector3(model.body.right_pelvis[0], model.body.right_pelvis[1], model.body.right_pelvis[2]);
-            this.bonesAndJoint.right_thigh = new Objects.Cylinder(scene, this.distance(model.right_leg.knee, anchor.toArray()));
+            this.bonesAndJoint.right_thigh = new Objects.Cylinder(this.body, this.distance(model.right_leg.knee, anchor.toArray()));
             this.bonesAndJoint.right_thigh.startPoint = anchor;
             this.bonesAndJoint.right_thigh.endPoint = this.bonesAndJoint.right_knee.centerPoint;
-            this.bonesAndJoint.right_shin = new Objects.Cylinder(scene, this.distance(model.right_leg.knee, model.right_leg.ankle));
+            this.bonesAndJoint.right_shin = new Objects.Cylinder(this.body, this.distance(model.right_leg.knee, model.right_leg.ankle));
             this.bonesAndJoint.right_shin.startPoint = this.bonesAndJoint.right_ankle.centerPoint;
             this.bonesAndJoint.right_shin.endPoint = this.bonesAndJoint.right_knee.centerPoint;
 
@@ -334,7 +335,7 @@ module Solver {
                 mesh.scale.x = 20;
                 mesh.scale.y = 20;
                 mesh.scale.z = 20;
-                head.translateY(87);
+                //head.translateY(47);
                 head.add(mesh);
             });
             loader.load("json/cartoonskeleton/jaw.json", function(geometry, material) {
@@ -354,10 +355,9 @@ module Solver {
                 mesh.scale.y = scale;
                 mesh.scale.z = scale;
                 mesh.translateZ(0.32108 * scale);
-                mesh.translateY(0.49917 * scale);
+                mesh.translateY(0.49917 * scale - 40);
                 torso.add(mesh);
             });
         }
-
     }
 }

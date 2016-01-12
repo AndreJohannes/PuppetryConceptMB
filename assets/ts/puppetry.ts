@@ -24,8 +24,7 @@ class Render {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth
             / window.innerHeight, 1, 10000);
         this.camera.position.z = 220;
-        this.camera.position.y = 100;
-
+        this.camera.position.y = 200;
         var scene = this.scene;
         //scene.add(this.volante);
         scene.add(this.stage);
@@ -58,7 +57,8 @@ class Render {
         $('#envelope').append(this.renderer.domElement);
         this.stats = this.addStats($('#envelope'));
         this.controls = new THREE.TrackballControls(this.camera, this.renderer.domElement);
-
+        this.controls.target0.y = 100;
+        this.controls.reset();
     }
 
 
@@ -127,11 +127,11 @@ window.onload = function() {
                 case Solver.Commands.RoleEyes:
                     solver.roleEyes();
                     break;
-                case Solver.Commands.StopEyes:    
+                case Solver.Commands.StopEyes:
                     solver.roleEyes(false);
                     break;
             }
         }
-        render.solver.setVolante(data.ort,data.acc, mode);
+        render.solver.setVolante(data.ort, data.acc, mode);
     };
 };

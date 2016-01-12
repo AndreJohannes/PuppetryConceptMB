@@ -15,7 +15,7 @@ var Render = (function () {
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth
             / window.innerHeight, 1, 10000);
         this.camera.position.z = 220;
-        this.camera.position.y = 100;
+        this.camera.position.y = 200;
         var scene = this.scene;
         //scene.add(this.volante);
         scene.add(this.stage);
@@ -44,6 +44,8 @@ var Render = (function () {
         $('#envelope').append(this.renderer.domElement);
         this.stats = this.addStats($('#envelope'));
         this.controls = new THREE.TrackballControls(this.camera, this.renderer.domElement);
+        this.controls.target0.y = 100;
+        this.controls.reset();
     }
     Render.prototype.addStats = function (dom) {
         var stats = new Stats();

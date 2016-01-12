@@ -30,11 +30,13 @@ module Solver {
             var phi = state[2]; var phiDot = state[3]; var phiDotDot = ret[3];
             var y = state[4]; var ydot = state[5]; var ydotdot = ret[5];
             var x = state[6]; var xdot = state[7]; var xdotdot = ret[7];
+            var z = state[8]; var zdot = state[9]; var zdotdot = ret[9];
             this.head.setAcceleration(ydotdot);
             ret = ret.concat(this.head.evaluate(state));
             for (var entry in this.extremeties) {
                 this.extremeties[entry].rotateAnchor(theta, thetaDot, thetaDotDot,
-                    phi, phiDot, phiDotDot, x, xdot, xdotdot, y, ydot, ydotdot);
+                    phi, phiDot, phiDotDot,
+                    x, xdot, xdotdot, y, ydot, ydotdot, z, zdot, zdotdot);
                 ret = ret.concat(this.extremeties[entry].evaluate(state));
             }
             return ret;
