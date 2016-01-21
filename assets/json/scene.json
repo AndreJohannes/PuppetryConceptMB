@@ -40,11 +40,11 @@
                 "type": "SpotLight",
                  "name": "SpotLight1",
                 "castShadow": true,
-                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -150, 500, 200, 1],
-                "color": 16777215,
+                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, -200, 500, 200, 1],
+                "color": 16711680,
                 "intensity": 0.8,
                 "distance": 0,
-                "angle": 0.4471975511965976,
+                "angle": 0.14471975511965976,
                 "decay": 1,
                 "exponent": 30
             },{
@@ -52,17 +52,31 @@
                 "type": "SpotLight",
                 "name": "SpotLight2",
                 "castShadow": true,
-                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 200, 500, 200, 1],
-                "color": 16777215,
-                "intensity": 0.1,
+                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 500, 200, 1],
+                "color": 65280,
+                "intensity": 0.8,
                 "distance": 0,
-                "angle": 0.4471975511965976,
+                "angle": 0.14471975511965976,
+                "decay": 1,
+                "exponent": 30
+            },
+            {
+                "uuid": "Af67E0B4-C5A9-40C2-8EDA-F0F2F698923F",
+                "type": "SpotLight",
+                "name": "SpotLight3",
+                "castShadow": true,
+                "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 200, 500, 200, 1],
+                "color": 255,
+                "intensity": 0.8,
+                "distance": 0,
+                "angle": 0.14471975511965976,
                 "decay": 1,
                 "exponent": 30
             },
              {
                 "uuid": "6A9DD607-23E8-4D24-B3E7-367635B959E1",
                 "type": "AmbientLight",
+                "name": "AmbientLight",
                 "matrix": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
                 "color": 1513239
             }

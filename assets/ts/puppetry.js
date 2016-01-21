@@ -6,18 +6,18 @@
 var Render = (function () {
     function Render() {
         this.solver = { "solve": function () { } };
+        this.volante = new THREE.Object3D();
         this.cylinders = new Array();
         this.spheres = new Array();
         this.body = new THREE.Object3D();
         this.stage = new THREE.Object3D();
-        this.volante = new THREE.Object3D();
         this.scene = new THREE.Scene();
         this.camera = new THREE.PerspectiveCamera(75, window.innerWidth
             / window.innerHeight, 1, 10000);
         this.camera.position.z = 220;
         this.camera.position.y = 200;
         var scene = this.scene;
-        //scene.add(this.volante);
+        //sscene.add(this.volante);
         scene.add(this.stage);
         scene.add(this.body);
         var that = this;
@@ -28,6 +28,7 @@ var Render = (function () {
             var texture = THREE.ImageUtils.loadTexture("textures/floorboards.jpg");
             stage.material = new THREE.MeshPhongMaterial({ color: 0xffffff, map: texture });
             that.stage.add(obj);
+            that.lighting = new Lighting.Lighting(that.scene);
             (new THREE.ObjectLoader).load('json/volante.json', function (obj) {
                 that.volante.add(obj);
                 //that.scene.add(obj);
@@ -101,6 +102,7 @@ window.onload = function () {
                 case Solver.Commands.PlayAudio:
                     audio.src = "music/twist.mp3";
                     audio.play();
+                    render.lighting.start();
                     break;
                 case Solver.Commands.StopAudio:
                     audio.src = "music/twist.mp3";
@@ -113,6 +115,6 @@ window.onload = function () {
                     break;
             }
         }
-        render.solver.setVolante(data.ort, data.acc, mode);
+        solver.setVolante(data.ort, data.acc, mode);
     };
 };

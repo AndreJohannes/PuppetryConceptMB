@@ -13,11 +13,14 @@ import NanoHTTPD.NanoHTTPD;
 import NanoHTTPD.NanoHTTPD.Response.IStatus;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.util.Log;
 
 public class HTTPServer extends NanoHTTPD {
 
 	private Context context;
 	private static HTTPServer instance = null;
+	private AssetFileDescriptor fileDescriptor;
 	public static final String MIME_PLAINTEXT = "text/plain", MIME_HTML = "text/html",
 			MIME_JS = "application/javascript", MIME_CSS = "text/css", MIME_JPG = "image/jpg",
 			MIME_DEFAULT_BINARY = "application/octet-stream", MIME_XML = "text/xml", MIME_AUDIO = "audio/mpeg";
@@ -46,26 +49,29 @@ public class HTTPServer extends NanoHTTPD {
 				return newChunkedResponse(NanoHTTPD.Response.Status.OK, MIME_JPG, mbuffer);
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("tag", "Failed to get jpg file.", e);
 			}
-			// HTTP_OK = "200 OK" or HTTP_OK = Status.OK;(check comments)
-		}else if(uriString.contains(".mp3")) {
+		} else if (uriString.contains(".mp3")) {
 			InputStream mbuffer;
 			try {
-				mbuffer = context.getAssets().open(uriString.substring(1));
+				if (fileDescriptor != null) {
+					mbuffer = fileDescriptor.createInputStream();
+				} else
+					mbuffer = context.getAssets().open(uriString.substring(1));
 				return newChunkedResponse(NanoHTTPD.Response.Status.OK, MIME_AUDIO, mbuffer);
 
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				Log.e("tag", "Failed to get mp3 file.", e);
 			}
-			// HTTP_OK = "200 OK" or HTTP_OK = Status.OK;(check comments)
 		}
 
 		URI uri = URI.create(uriString);
 		String msg = getStringOfFile(uri.getPath());
 		return newFixedLengthResponse(msg);
+	}
+
+	public void setMusicFile(AssetFileDescriptor fd) {
+		this.fileDescriptor = fd;
 	}
 
 	private String getStringOfFile(String file) {

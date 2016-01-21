@@ -30,14 +30,15 @@ var Solver;
         return LocationEye;
     })(THREE.Vector3);
     var Head = (function () {
-        function Head() {
+        function Head(offset) {
             this.radius = 3;
             this.eyeState = EyeState.Stopped;
-            this.offset = 10;
+            this.offset = 12;
             this.acceleration = 0;
             this.alpha = 0;
             this.beta = 0;
             this.gamma = 0;
+            this.offset = offset;
             var centerLeftEye = new THREE.Vector3(.38320 * 20, 0.04951 * 20, 0.73292 * 20);
             var upLeftEye = new THREE.Vector3(0.967638, 0., -0.252342);
             var leftLeftEye = new THREE.Vector3(0., 0.999691, -0.024849);

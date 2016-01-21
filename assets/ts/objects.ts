@@ -15,7 +15,7 @@ module Objects {
                 });
             this.mesh = new THREE.Mesh(sphere, material);
             this.mesh.castShadow = true;
-            scene.add(this.mesh);
+            if (radius > 0) scene.add(this.mesh);
         }
 
         set centerPoint(point: THREE.Vector3) {

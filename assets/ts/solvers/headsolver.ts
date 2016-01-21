@@ -37,13 +37,14 @@ module Solver {
         public locRightEye: LocationEye;
         private radius: number = 3;
         private eyeState: EyeState = EyeState.Stopped;
-        private offset: number = 10;
+        private offset: number = 12;
         private acceleration: number = 0;
         private alpha: number = 0;
         private beta: number = 0;
         private gamma: number = 0;
 
-        constructor() {
+        constructor(offset: number) {
+            this.offset = offset;
             var centerLeftEye = new THREE.Vector3(.38320 * 20, 0.04951 * 20, 0.73292 * 20);
             var upLeftEye = new THREE.Vector3(0.967638, 0., -0.252342);
             var leftLeftEye = new THREE.Vector3(0., 0.999691, -0.024849);

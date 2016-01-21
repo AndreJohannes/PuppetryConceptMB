@@ -12,16 +12,16 @@ var Solver;
     var Body = (function () {
         function Body() {
             this.torso = new Solver.Torso();
-            this.head = new Solver.Head();
+            this.head = new Solver.Head(this.torso.length());
             this.extremeties = {};
             var offset = this.torso.length() + this.head.length();
             this.extremeties[Extremeties.ARM_RIGHT.toString()] = new Solver.Arm(offset);
             offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
             this.extremeties[Extremeties.ARM_LEFT.toString()] = new Solver.Arm(offset);
             offset += this.extremeties[Extremeties.ARM_LEFT.toString()].length();
-            this.extremeties[Extremeties.LEG_RIGHT.toString()] = new Solver.Leg(offset);
+            this.extremeties[Extremeties.LEG_RIGHT.toString()] = new Solver.Leg_new(offset);
             offset += this.extremeties[Extremeties.LEG_RIGHT.toString()].length();
-            this.extremeties[Extremeties.LEG_LEFT.toString()] = new Solver.Leg(offset); //offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
+            this.extremeties[Extremeties.LEG_LEFT.toString()] = new Solver.Leg_new(offset); //offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
         }
         Body.prototype.evaluate = function (state) {
             var ret = this.torso.evaluate(state);
@@ -31,19 +31,22 @@ var Solver;
             var phi = state[2];
             var phiDot = state[3];
             var phiDotDot = ret[3];
-            var y = state[4];
-            var ydot = state[5];
-            var ydotdot = ret[5];
-            var x = state[6];
-            var xdot = state[7];
-            var xdotdot = ret[7];
-            var z = state[8];
-            var zdot = state[9];
-            var zdotdot = ret[9];
+            var psi = state[4];
+            var psiDot = state[5];
+            var psiDotDot = ret[5];
+            var y = state[6];
+            var ydot = state[7];
+            var ydotdot = ret[7];
+            var x = state[8];
+            var xdot = state[9];
+            var xdotdot = ret[9];
+            var z = state[10];
+            var zdot = state[11];
+            var zdotdot = ret[11];
             this.head.setAcceleration(ydotdot);
             ret = ret.concat(this.head.evaluate(state));
             for (var entry in this.extremeties) {
-                this.extremeties[entry].rotateAnchor(theta, thetaDot, thetaDotDot, phi, phiDot, phiDotDot, x, xdot, xdotdot, y, ydot, ydotdot, z, zdot, zdotdot);
+                this.extremeties[entry]._rotateAnchor(theta, thetaDot, thetaDotDot, -phi, -phiDot, -phiDotDot, -psi, -psiDot, -psiDotDot, x, xdot, xdotdot, y, ydot, ydotdot, z, zdot, zdotdot);
                 ret = ret.concat(this.extremeties[entry].evaluate(state));
             }
             return ret;
@@ -78,7 +81,7 @@ var Solver;
                         if (entry == Extremeties.ARM_RIGHT)
                             height = 50 * tilt;
                         if (entry == Extremeties.ARM_LEFT)
-                            height = -50 * tilt;
+                            height = 50 * tilt;
                         //if (entry == Extremeties.LEG_RIGHT)
                         //    height = Math.max(-30 * tilt, 0);
                         //if (entry == Extremeties.LEG_LEFT)

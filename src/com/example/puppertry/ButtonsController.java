@@ -3,6 +3,7 @@ package com.example.puppertry;
 import com.example.puppertry.helpers.Commands;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -17,7 +18,8 @@ public class ButtonsController {
 	private final CommandDispatcher commandDispatcher;
 	private final Activity activity;
 
-	public ButtonsController(Activity activity, SensorEvaluator sensorEvaluator, CommandDispatcher commandDispatcher) {
+	public ButtonsController(final Activity activity, SensorEvaluator sensorEvaluator,
+			CommandDispatcher commandDispatcher) {
 
 		this.activity = activity;
 		this.sensorEvaluator = sensorEvaluator;
@@ -40,6 +42,21 @@ public class ButtonsController {
 
 		final SeekBar hightSlider = (SeekBar) activity.findViewById(R.id.seekBar1);
 		hightSlider.setOnSeekBarChangeListener(getHightSliderListener());
+
+		final SeekBar alphaSlider = (SeekBar) activity.findViewById(R.id.seekBar2);
+		alphaSlider.setOnSeekBarChangeListener(getAlphaSliderListener());
+
+		final SeekBar betaSlider = (SeekBar) activity.findViewById(R.id.seekBar3);
+		betaSlider.setOnSeekBarChangeListener(getBetaSliderListener());
+
+		final Button selectMusic = (Button) activity.findViewById(R.id.btnId7);
+		selectMusic.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(activity, MusicSelectActivity.class);
+				activity.startActivity(intent);
+			}
+		});
 
 	}
 
@@ -127,6 +144,40 @@ public class ButtonsController {
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 				sensorEvaluator.setAccelerationOffset(
 						20.0 * (double) (seekBar.getMax() - progress) / (double) seekBar.getMax());
+			}
+		};
+	}
+
+	private OnSeekBarChangeListener getAlphaSliderListener() {
+		return new OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				sensorEvaluator.setAlpha(3d * (double) (progress) / (double) seekBar.getMax());
+			}
+		};
+	}
+
+	private OnSeekBarChangeListener getBetaSliderListener() {
+		return new OnSeekBarChangeListener() {
+			@Override
+			public void onStopTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar seekBar) {
+			}
+
+			@Override
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				sensorEvaluator.setBeta(3d * (double) (progress) / (double) seekBar.getMax());
 			}
 		};
 	}

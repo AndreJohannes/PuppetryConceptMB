@@ -13,4 +13,12 @@ var MathUtils;
         return (Math.exp(x) - Math.exp(-x)) / (Math.exp(x) + Math.exp(-x));
     }
     MathUtils.tanh = tanh;
+    function len(vector) {
+        var retValue = 0;
+        for (var key in vector) {
+            retValue += Math.pow(vector[key], 2);
+        }
+        return Math.sqrt(retValue);
+    }
+    MathUtils.len = len;
 })(MathUtils || (MathUtils = {}));

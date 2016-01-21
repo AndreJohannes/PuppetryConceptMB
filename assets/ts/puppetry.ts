@@ -11,12 +11,13 @@ class Render {
     private renderer: THREE.WebGLRenderer;
     private controls: THREE.TrackballControls;
 
-    private solver = { "solve": function() { } };
+    public solver = { "solve": function() { } };
+    public volante: THREE.Object3D = new THREE.Object3D();
+    public lighting: Lighting.Lighting;
     private cylinders: Array<Objects.Cylinder> = new Array();
     private spheres: Array<Objects.Sphere> = new Array();
     private body: THREE.Object3D = new THREE.Object3D();
     private stage: THREE.Object3D = new THREE.Object3D();
-    private volante: THREE.Object3D = new THREE.Object3D();
     private stats: Stats;
 
     constructor() {
@@ -26,7 +27,7 @@ class Render {
         this.camera.position.z = 220;
         this.camera.position.y = 200;
         var scene = this.scene;
-        //scene.add(this.volante);
+        //sscene.add(this.volante);
         scene.add(this.stage);
         scene.add(this.body);
         var that = this;
@@ -36,8 +37,8 @@ class Render {
             var stage: THREE.Mesh = <THREE.Mesh>(obj.getObjectByName("stage"));
             var texture = THREE.ImageUtils.loadTexture("textures/floorboards.jpg");
             stage.material = new THREE.MeshPhongMaterial({ color: 0xffffff, map: texture });
-
             that.stage.add(obj);
+            that.lighting = new Lighting.Lighting(that.scene);
             (new THREE.ObjectLoader).load('json/volante.json', function(obj) {
                 that.volante.add(obj);
                 //that.scene.add(obj);
@@ -94,7 +95,7 @@ class Render {
 window.onload = function() {
     this.render = new Render();
     this.render.animate();
-    var render = this.render;
+    var render: Render = this.render;
     var audio = new Audio("music/twist.mp3");
     var connection = new WebSocket('ws://' + window.location.hostname + ':9090', [
         'soap', 'xmpp']);
@@ -120,6 +121,7 @@ window.onload = function() {
                 case Solver.Commands.PlayAudio:
                     audio.src = "music/twist.mp3";
                     audio.play();
+                    render.lighting.start();
                     break;
                 case Solver.Commands.StopAudio:
                     audio.src = "music/twist.mp3";
@@ -132,6 +134,6 @@ window.onload = function() {
                     break;
             }
         }
-        render.solver.setVolante(data.ort, data.acc, mode);
+        solver.setVolante(data.ort, data.acc, mode);
     };
 };

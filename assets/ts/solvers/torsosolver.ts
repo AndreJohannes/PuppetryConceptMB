@@ -15,17 +15,21 @@ module Solver {
             var thetadot = state[1];
             var phi = state[2];
             var phidot = state[3];
-            var z = state[4];
-            var zdot = state[5];
-            var x = state[6];
-            var xdot = state[7];
-            var y = state[8];
-            var ydot = state[9];
+            var psi = state[4];
+            var psidot = state[5];
+            var z = state[6];
+            var zdot = state[7];
+            var x = state[8];
+            var xdot = state[9];
+            var y = state[10];
+            var ydot = state[11];
 
             var k = 1; var d = 0.5;
             var thetadotdot = k * MathUtils.mod(this.alpha - theta) - d * thetadot;
             k = 1; d = 0.5;
             var phidotdot = k * MathUtils.mod(this.beta - phi) - d * phidot;
+            k = 1; d = 0.5;
+            var psidotdot = k * MathUtils.mod(this.gamma - 2 * psi) - d * psidot;
             k = z > 0 ? .5 : 3; d = 0.5;
             var force = 3 * MathUtils.tanh((- k * z + this.force.z) / 2);
             var zdotdot = force - d * zdot;
@@ -36,11 +40,13 @@ module Solver {
             force = MathUtils.tanh(- k * y + this.force.y);
             var ydotdot = (force - d * ydot);
 
-            return [thetadot, thetadotdot, phidot, phidotdot, zdot, zdotdot, xdot, xdotdot, ydot, ydotdot];
+            return [thetadot, thetadotdot, phidot, phidotdot,
+                psidot, psidotdot,
+                zdot, zdotdot, xdot, xdotdot, ydot, ydotdot];
         }
 
         public length(): number {
-            return 10
+            return 12
         }
 
         public setAlphaBetaAndForce(alpha: number, beta: number, force: number) {

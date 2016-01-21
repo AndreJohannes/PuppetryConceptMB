@@ -1,9 +1,8 @@
 package com.example.puppertry;
 
-import java.util.Locale;
+import com.example.puppertry.helpers.KalmanFilter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -21,11 +20,15 @@ public class SensorEvaluator implements SensorEventListener {
 	private float[] otArray = new float[3], rotationMatrix = new float[9];
 	private float[] accel = new float[3], mag = new float[3], daccel = new float[3];
 	private float ortX, ortY, ortZ, ortXOffset = 0;
-	private static float alpha = 0.5f;
+	private float accX, accY, accZ = 0;
+	private final KalmanFilter kalmanOrientationFilter;
+	private final KalmanFilter kalmanAccelerationFilter;
 	private long time;
 	private double accelerationOffset = 10;
-	
+
 	public SensorEvaluator(Activity activity, WebSocketServer webSocketServer, CommandDispatcher commandDispatcher) {
+		this.kalmanOrientationFilter = getKalmanFilterForOrientation();
+		this.kalmanAccelerationFilter = getKalmanFilterForAcceleration();
 		this.webSocketServer = webSocketServer;
 		this.commandDispatcher = commandDispatcher;
 		sensorManager = (SensorManager) activity.getSystemService(activity.SENSOR_SERVICE);
@@ -52,44 +55,43 @@ public class SensorEvaluator implements SensorEventListener {
 		float[] inputArray = event.values;
 		switch (event.sensor.getType()) {
 		case Sensor.TYPE_MAGNETIC_FIELD:
-			mag[0] = inputArray[0] + alpha * (mag[0] - inputArray[0]);
-			mag[1] = inputArray[1] + alpha * (mag[1] - inputArray[1]);
-			mag[2] = inputArray[2] + alpha * (mag[2] - inputArray[2]);
+			mag = inputArray;
 			return;
 		case Sensor.TYPE_ACCELEROMETER:
 			float[] accelOld = accel.clone();
-			accel[0] = inputArray[0] + alpha * (accel[0] - inputArray[0]);
-			accel[1] = inputArray[1] + alpha * (accel[1] - inputArray[1]);
-			accel[2] = inputArray[2] + alpha * (accel[2] - inputArray[2]);
-			linearAcceleration = (float) (Math.signum(accel[2])
-					* Math.sqrt(accel[0] * accel[0] + accel[1] * accel[1] + accel[2] * accel[2]));
+			accel = inputArray;
 			long timeOld = time;
 			time = System.currentTimeMillis();
 			float dTime = (time - timeOld);
 			float DaccelX = (accel[0] - accelOld[0]) / dTime;
 			float DaccelY = (accel[1] - accelOld[1]) / dTime;
 			float DaccelZ = (accel[2] - accelOld[2]) / dTime;
-			daccel[0] = DaccelX + (alpha + 0.2f) * (daccel[0] - DaccelX);
-			daccel[1] = DaccelY + (alpha + 0.2f) * (daccel[1] - DaccelY);
-			daccel[2] = DaccelZ + (alpha + 0.2f) * (daccel[2] - DaccelZ);
+			daccel[0] = DaccelX + (0.5f) * (daccel[0] - DaccelX);
+			daccel[1] = DaccelY + (0.5f) * (daccel[1] - DaccelY);
+			daccel[2] = DaccelZ + (0.5f) * (daccel[2] - DaccelZ);
 			break;
 		}
 		boolean success = SensorManager.getRotationMatrix(rotationMatrix, null, accel, mag);
 		if (success) {
 			SensorManager.getOrientation(rotationMatrix, otArray);
-			// ortX = otArray[0] + alpha * applyOffset(ortX - otArray[0], 0);
-			ortY = otArray[1];// + alpha * (ortY - otArray[1]);
-			float ortZ_old = ortZ;
-			ortZ = otArray[2];// + alpha * (ortZ - otArray[2]);
-			// if (Math.abs(ortZ_old - ortZ) < 0.05)
-			// if (Math.sqrt(daccel[0] * daccel[0] + daccel[2] * daccel[2]) <
-			// 0.005)
-			float alpha2 = (float) (0.5
-					* (1. + Math.tanh(900 * (Math.sqrt(daccel[0] * daccel[0] + daccel[2] * daccel[2]) - 0.005))));
-			ortX = otArray[0] + alpha2 * applyOffset(ortX - otArray[0], 0);
+
+			KalmanFilter.Vector state = kalmanOrientationFilter
+					.step(new KalmanFilter.Vector(new double[] { otArray[1], otArray[2] }));
+			ortX = 0;
+			ortY = (float) state.getValue(0);
+			ortZ = (float) state.getValue(1);
+
+			state = kalmanAccelerationFilter
+					.step(new KalmanFilter.Vector(new double[] { accel[0], accel[1], accel[2] }));
+			accX = (float) state.getValue(0);
+			accY = (float) state.getValue(1);
+			accZ = (float) state.getValue(2);
+
+			linearAcceleration = (float) Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+
 			commandDispatcher.setEuler(applyOffset(ortX, ortXOffset), -ortY, ortZ);
 			commandDispatcher.setLinearAcceleration(linearAcceleration - this.accelerationOffset);
-			commandDispatcher.setAccelerations(accel[0], accel[1], accel[2]);
+			commandDispatcher.setAccelerations(accX, accY, accZ);
 			commandDispatcher.sendCommand();
 
 			otX.setText(String.format("%.3f", applyOffset(ortX, ortXOffset)));
@@ -101,9 +103,19 @@ public class SensorEvaluator implements SensorEventListener {
 	public void setCalibrationOffset() {
 		ortXOffset = ortX;
 	}
-	
-	public void setAccelerationOffset(double value){
+
+	public void setAccelerationOffset(double value) {
 		this.accelerationOffset = value;
+	}
+
+	public void setAlpha(double value) {
+		double scale = Math.exp(Math.log(10d) * value);
+		this.kalmanOrientationFilter.setR(KalmanFilter.Matrix.eye(2).scale(scale));
+	}
+
+	public void setBeta(double value) {
+		double scale = Math.exp(Math.log(10d) * value);
+		this.kalmanAccelerationFilter.setR(KalmanFilter.Matrix.eye(3).scale(scale));
 	}
 
 	public void unregister() {
@@ -118,6 +130,48 @@ public class SensorEvaluator implements SensorEventListener {
 		float b = (float) (2 * Math.PI);
 		float retValue = (a % b + b) % b;
 		return (float) (retValue > Math.PI ? retValue - 2 * Math.PI : retValue);
+	}
+
+	private KalmanFilter getKalmanFilterForOrientation() {
+		KalmanFilter.Matrix A = new KalmanFilter.Matrix(4, 4);
+		A.setValue(0, 0, 1);
+		A.setValue(0, 2, 1);
+		A.setValue(1, 1, 1);
+		A.setValue(1, 3, 1);
+		A.setValue(2, 2, 1);
+		A.setValue(3, 3, 1);
+		KalmanFilter.Matrix B = new KalmanFilter.Matrix(4, 4);
+		KalmanFilter.Matrix H = new KalmanFilter.Matrix(2, 4);
+		H.setValue(0, 0, 1);
+		H.setValue(1, 1, 1);
+		KalmanFilter.Matrix Q = KalmanFilter.Matrix.eye(4).scale(1);
+		KalmanFilter.Matrix R = KalmanFilter.Matrix.eye(2).scale(100);
+		KalmanFilter.Matrix P = KalmanFilter.Matrix.eye(4).scale(10);
+		KalmanFilter.Vector x = new KalmanFilter.Vector(new double[] { 0, 0, 0, 0 });
+		return new KalmanFilter(A, Q, H, R, x, P);
+	}
+
+	private KalmanFilter getKalmanFilterForAcceleration() {
+		KalmanFilter.Matrix A = new KalmanFilter.Matrix(6, 6);
+		A.setValue(0, 0, 1);
+		A.setValue(0, 3, 1);
+		A.setValue(1, 1, 1);
+		A.setValue(1, 4, 1);
+		A.setValue(2, 2, 1);
+		A.setValue(2, 5, 1);
+		A.setValue(3, 3, 1);
+		A.setValue(4, 4, 1);
+		A.setValue(5, 5, 1);
+		KalmanFilter.Matrix B = new KalmanFilter.Matrix(6, 6);
+		KalmanFilter.Matrix H = new KalmanFilter.Matrix(3, 6);
+		H.setValue(0, 0, 1);
+		H.setValue(1, 1, 1);
+		H.setValue(2, 2, 1);
+		KalmanFilter.Matrix Q = KalmanFilter.Matrix.eye(6).scale(1);
+		KalmanFilter.Matrix R = KalmanFilter.Matrix.eye(3).scale(100);
+		KalmanFilter.Matrix P = KalmanFilter.Matrix.eye(6).scale(10);
+		KalmanFilter.Vector x = new KalmanFilter.Vector(new double[] { 0, 0, 0, 0, 0, 0 });
+		return new KalmanFilter(A, Q, H, R, x, P);
 	}
 
 }

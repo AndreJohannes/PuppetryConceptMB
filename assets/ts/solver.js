@@ -109,18 +109,19 @@ var Solver;
             this.state = this.rkSolver.solve(this.state, 0.01);
             this.state = this.rkSolver.solve(this.state, 0.01);
             this.state = this.rkSolver.solve(this.state, 0.01);
+            this.torso.rotation.z = this.state[4];
             this.torso.rotation.x = this.state[2];
             this.torso.rotation.y = this.state[0];
-            this.torso.position.y = this.state[4];
-            this.torso.position.x = this.state[6];
-            this.torso.position.z = this.state[8];
-            this.head.position.y = 47 + this.state[10];
+            this.torso.position.y = this.state[6];
+            this.torso.position.x = this.state[8];
+            this.torso.position.z = this.state[10];
+            this.head.position.y = 21 + this.state[12];
             this.head.rotation.x = this.state[2];
-            this.head.rotation.y = this.state[12];
-            this.head.rotation.z = this.state[14];
+            this.head.rotation.y = this.state[14];
+            this.head.rotation.z = this.state[16];
             this.bonesAndJoint.left_eye.centerPoint = this.bodySolver.head.locLeftEye;
             this.bonesAndJoint.right_eye.centerPoint = this.bodySolver.head.locRightEye;
-            var offset = 16;
+            var offset = 18;
             this.bonesAndJoint.right_elbow.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.right_wrist.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
             var arm = this.bodySolver.extremeties[Solver_1.Extremeties.ARM_RIGHT.toString()];
@@ -156,10 +157,10 @@ var Solver;
             this.bodySolver.setEulersAndAccelerations(-orientation[0], -orientation[1], -orientation[2], accelerations[0], accelerations[1], orientation[3], mode);
         };
         Solver.prototype.openJaw = function () {
-            this.jaw.position.y = -1;
+            this.jaw.position.y = -3;
         };
         Solver.prototype.closeJaw = function () {
-            this.jaw.position.y = 2;
+            this.jaw.position.y = 0;
         };
         Solver.prototype.getState = function () {
             return this.state;
@@ -173,7 +174,7 @@ var Solver;
         };
         Solver.prototype.addModel = function (scene, model) {
             var threeZeros = [0, 0, 0];
-            this.state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            this.state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             this.state = this.state.concat(model.right_arm.elbow).concat(threeZeros).concat(model.right_arm.wrist).concat(threeZeros).concat(model.right_arm.suspension).concat(threeZeros);
             this.state = this.state.concat(model.left_arm.elbow).concat(threeZeros).concat(model.left_arm.wrist).concat(threeZeros).concat(model.left_arm.suspension).concat(threeZeros);
             this.state = this.state.concat(model.right_leg.knee).concat(threeZeros).concat(model.right_leg.ankle).concat(threeZeros).concat(model.right_leg.suspension).concat(threeZeros);
@@ -201,8 +202,8 @@ var Solver;
             this.head.rotation.order = 'ZYX';
             this.bonesAndJoint = new BonesAndJoints();
             this.loadTorso(this.torso, this.head, this);
-            this.bonesAndJoint.left_eye = new Objects.Sphere(this.head);
-            this.bonesAndJoint.right_eye = new Objects.Sphere(this.head);
+            this.bonesAndJoint.left_eye = new Objects.Sphere(this.head, 0);
+            this.bonesAndJoint.right_eye = new Objects.Sphere(this.head, 0);
             this.bonesAndJoint.left_eye.centerPoint = this.bodySolver.head.locLeftEye;
             this.bonesAndJoint.right_eye.centerPoint = this.bodySolver.head.locRightEye;
             this.bonesAndJoint.left_elbow = new Objects.Sphere(this.body);
@@ -259,19 +260,19 @@ var Solver;
         };
         Solver.prototype.loadTorso = function (torso, head, that) {
             var loader = new THREE.JSONLoader();
-            loader.load("json/cartoonskeleton/skull.json", function (geometry, material) {
+            loader.load("json/evilskull/skull.json", function (geometry, material) {
                 var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
                 mesh.scale.x = 20;
-                mesh.scale.y = 20;
-                mesh.scale.z = 20;
+                mesh.scale.y = 18;
+                mesh.scale.z = 18;
                 //head.translateY(47);
                 head.add(mesh);
             });
-            loader.load("json/cartoonskeleton/jaw.json", function (geometry, material) {
+            loader.load("json/evilskull/jaw.json", function (geometry, material) {
                 var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
                 mesh.scale.x = 20;
-                mesh.scale.y = 20;
-                mesh.scale.z = 20;
+                mesh.scale.y = 18;
+                mesh.scale.z = 18;
                 //mesh.translateY(87);
                 mesh.name = "jaw";
                 that.jaw = mesh;
