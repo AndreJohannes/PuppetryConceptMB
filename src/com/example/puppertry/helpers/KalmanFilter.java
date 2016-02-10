@@ -132,8 +132,12 @@ public class KalmanFilter {
 			if (this.m != this.n)
 				throw new RuntimeException("Matrix is not square");
 			switch (this.m) {
+			case 1:
+				Matrix retMatrix = new Matrix(1,1);
+				retMatrix.data[0][0] =1./ this.data[0][0];
+				return retMatrix;
 			case 2:
-				Matrix retMatrix = new Matrix(2, 2);
+				retMatrix = new Matrix(2, 2);
 				double denominator = this.data[0][0] * this.data[1][1] - this.data[0][1] * this.data[1][0];
 				retMatrix.data[0][0] = this.data[1][1] / denominator;
 				retMatrix.data[1][1] = this.data[0][0] / denominator;

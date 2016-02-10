@@ -33,9 +33,11 @@ module Objects {
 
         //private scene: THREE.Scene;
         private pivot: THREE.Object3D;
+        private body: THREE.Object3D;
         private mesh: THREE.Mesh;
         private _startPoint: THREE.Vector3;
         private _endPoint: THREE.Vector3;
+        private _angle: number = 0;
 
         constructor(scene: THREE.Object3D, height: number) {
             //this.scene = scene;
@@ -46,8 +48,10 @@ module Objects {
                 });
             this.mesh = new THREE.Mesh(cylinder, material);
             this.mesh.castShadow = true;
+            this.body = new THREE.Object3D();
+            this.body.add(this.mesh);
             this.pivot = new THREE.Object3D();
-            this.pivot.add(this.mesh);
+            this.pivot.add(this.body);
             scene.add(this.pivot);
         }
 
@@ -59,6 +63,15 @@ module Objects {
         set endPoint(point: THREE.Vector3) {
             this._endPoint = point;
             this.updatePositionAndOrientation();
+        }
+
+        set angle(value: number) {
+            this._angle = value;
+            this.updatePositionAndOrientation();
+        }
+
+        public addObject(object: THREE.Object3D) {
+            this.body.add(object);
         }
 
         private updatePositionAndOrientation() {
@@ -79,8 +92,8 @@ module Objects {
 
         private setOrientation(alpha: number, beta: number) {
             var orientation: THREE.Matrix4 = new THREE.Matrix4();
-            orientation.makeRotationFromEuler(new THREE.Euler(beta, 0, -alpha, "ZYX"));
-            this.mesh.setRotationFromMatrix(orientation);
+            orientation.makeRotationFromEuler(new THREE.Euler(beta, alpha +  this._angle, - alpha, "ZXY"));
+            this.body.setRotationFromMatrix(orientation);
             //console.log(beta,-alpha, this.mesh.rotation.x,this.mesh.rotation.y,this.mesh.rotation.z)
             //this.mesh.rotation.set(beta, 0, -alpha);
         }

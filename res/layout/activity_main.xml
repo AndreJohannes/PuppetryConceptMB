@@ -17,16 +17,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <ToggleButton
+            <Button
                 android:id="@+id/btnId1"
                 android:layout_width="fill_parent"
                 android:layout_height="90dp"
-                android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
-                android:textOff="Roll Eyes"
-                android:textOn="Stop Eyes"
-                android:textSize="20sp" />
+                android:text="Move LA"
+       		 />
 
             <Button
                 android:id="@+id/btnId2"
@@ -42,7 +40,7 @@
                 android:layout_height="90dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
-                android:text="Not Used" />
+                android:text="Move RA" />
         </TableRow>
 
         <TableRow

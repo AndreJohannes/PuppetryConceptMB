@@ -21,6 +21,7 @@ public class SensorEvaluator implements SensorEventListener {
 	private float[] accel = new float[3], mag = new float[3], daccel = new float[3];
 	private float ortX, ortY, ortZ, ortXOffset = 0;
 	private float accX, accY, accZ = 0;
+	private final KalmanFilter kalmanTurnFilter;
 	private final KalmanFilter kalmanOrientationFilter;
 	private final KalmanFilter kalmanAccelerationFilter;
 	private long time;
@@ -29,6 +30,7 @@ public class SensorEvaluator implements SensorEventListener {
 	public SensorEvaluator(Activity activity, WebSocketServer webSocketServer, CommandDispatcher commandDispatcher) {
 		this.kalmanOrientationFilter = getKalmanFilterForOrientation();
 		this.kalmanAccelerationFilter = getKalmanFilterForAcceleration();
+		this.kalmanTurnFilter = getKalmanFilterForTurn();
 		this.webSocketServer = webSocketServer;
 		this.commandDispatcher = commandDispatcher;
 		sensorManager = (SensorManager) activity.getSystemService(activity.SENSOR_SERVICE);
@@ -81,6 +83,9 @@ public class SensorEvaluator implements SensorEventListener {
 			ortY = (float) state.getValue(0);
 			ortZ = (float) state.getValue(1);
 
+			state = kalmanTurnFilter.step(new KalmanFilter.Vector(new double[]{otArray[0]}));
+			ortX = (float) state.getValue(0);
+			
 			state = kalmanAccelerationFilter
 					.step(new KalmanFilter.Vector(new double[] { accel[0], accel[1], accel[2] }));
 			accX = (float) state.getValue(0);
@@ -132,6 +137,21 @@ public class SensorEvaluator implements SensorEventListener {
 		return (float) (retValue > Math.PI ? retValue - 2 * Math.PI : retValue);
 	}
 
+	private KalmanFilter getKalmanFilterForTurn(){
+		KalmanFilter.Matrix A = new KalmanFilter.Matrix(2, 2);
+		A.setValue(0, 0, 1);
+		A.setValue(0, 1, 1);
+		A.setValue(1, 1, 1);
+		KalmanFilter.Matrix B = new KalmanFilter.Matrix(2, 2);
+		KalmanFilter.Matrix H = new KalmanFilter.Matrix(1, 2);
+		H.setValue(0, 0, 1);
+		KalmanFilter.Matrix Q = KalmanFilter.Matrix.eye(2).scale(1);
+		KalmanFilter.Matrix R = KalmanFilter.Matrix.eye(1).scale(2000);
+		KalmanFilter.Matrix P = KalmanFilter.Matrix.eye(2).scale(10);
+		KalmanFilter.Vector x = new KalmanFilter.Vector(new double[] { 0, 0 });
+		return new KalmanFilter(A, Q, H, R, x, P);
+	}
+	
 	private KalmanFilter getKalmanFilterForOrientation() {
 		KalmanFilter.Matrix A = new KalmanFilter.Matrix(4, 4);
 		A.setValue(0, 0, 1);

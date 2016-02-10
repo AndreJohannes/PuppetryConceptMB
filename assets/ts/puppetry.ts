@@ -44,15 +44,22 @@ class Render {
                 //that.scene.add(obj);
                 obj.rotation.order = "YZX";
                 that.solver = new Solver.Solver(that.body);
+                //window.animate = function(that, solver: Solver.Solver, time: number) {
+                //    return function() {
+                //        solver.setVolante([0, 0, Math.sin(time / 150), 0], [0, 0, 0], Solver.Mode.LeftTwist);
+                //        setTimeout(that.animate(that, solver, time + 17), 17);
+                //    }
+                //}
+                //window.animate(this, <Solver.Solver>that.solver, 0)();
             });
 
         });
 
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
         this.renderer.setSize(window.innerWidth - 20, window.innerHeight - 20);
         this.renderer.setClearColor(0x101010);
         //this.renderer.shadowMapEnabled = true;
-        //this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
+        this.renderer.shadowMapType = THREE.PCFSoftShadowMap;
     
         // Add fps statistics and trackball control
         $('#envelope').append(this.renderer.domElement);
@@ -126,14 +133,17 @@ window.onload = function() {
                 case Solver.Commands.StopAudio:
                     audio.src = "music/twist.mp3";
                     break;
-                case Solver.Commands.RoleEyes:
-                    solver.roleEyes();
+                case Solver.Commands.MoveLeftArm:
+                    
                     break;
-                case Solver.Commands.StopEyes:
-                    solver.roleEyes(false);
+                case Solver.Commands.MoveRightArm:
+                    
                     break;
             }
         }
         solver.setVolante(data.ort, data.acc, mode);
     };
+
+
+
 };

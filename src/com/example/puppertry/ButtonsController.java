@@ -37,9 +37,12 @@ public class ButtonsController {
 		final ToggleButton musicToggler = (ToggleButton) activity.findViewById(R.id.btnId8);
 		musicToggler.setOnCheckedChangeListener(getAudioListener());
 
-		final ToggleButton rollEyes = (ToggleButton) activity.findViewById(R.id.btnId1);
-		rollEyes.setOnCheckedChangeListener(getEyeListener());
+		final Button leftHandMove = (Button) activity.findViewById(R.id.btnId1);
+		leftHandMove.setOnTouchListener(getMoveLeftArmListener());
 
+		final Button rightHandMove = (Button) activity.findViewById(R.id.btnId3);
+		rightHandMove.setOnTouchListener(getMoveRightArmListener());
+		
 		final SeekBar hightSlider = (SeekBar) activity.findViewById(R.id.seekBar1);
 		hightSlider.setOnSeekBarChangeListener(getHightSliderListener());
 
@@ -116,17 +119,43 @@ public class ButtonsController {
 		};
 	}
 
-	private CompoundButton.OnCheckedChangeListener getEyeListener() {
-		return new CompoundButton.OnCheckedChangeListener() {
-			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-				if (isChecked) {
-					commandDispatcher.setCommand(Commands.RollEyes);
-					buttonView.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
-				} else {
-					commandDispatcher.setCommand(Commands.StopEyes);
-					buttonView.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
+	private View.OnTouchListener getMoveRightArmListener() {
+		return new View.OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View yourButton, MotionEvent theMotion) {
+				switch (theMotion.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					commandDispatcher.setCommand(Commands.MoveRightArm);
+					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
+					break;
+				case MotionEvent.ACTION_UP:
+					commandDispatcher.clearCommand(Commands.MoveRightArm);
+					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
+					break;
 				}
-			};
+				return true;
+			}
+		};
+	}
+	
+	private View.OnTouchListener getMoveLeftArmListener() {
+		return new View.OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View yourButton, MotionEvent theMotion) {
+				switch (theMotion.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					commandDispatcher.setCommand(Commands.MoveLeftArm);
+					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
+					break;
+				case MotionEvent.ACTION_UP:
+					commandDispatcher.clearCommand(Commands.MoveLeftArm);
+					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
+					break;
+				}
+				return true;
+			}
 		};
 	}
 

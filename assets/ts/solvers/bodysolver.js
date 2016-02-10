@@ -19,9 +19,9 @@ var Solver;
             offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
             this.extremeties[Extremeties.ARM_LEFT.toString()] = new Solver.Arm(offset);
             offset += this.extremeties[Extremeties.ARM_LEFT.toString()].length();
-            this.extremeties[Extremeties.LEG_RIGHT.toString()] = new Solver.Leg_new(offset);
+            this.extremeties[Extremeties.LEG_RIGHT.toString()] = new Solver.Leg(offset);
             offset += this.extremeties[Extremeties.LEG_RIGHT.toString()].length();
-            this.extremeties[Extremeties.LEG_LEFT.toString()] = new Solver.Leg_new(offset); //offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
+            this.extremeties[Extremeties.LEG_LEFT.toString()] = new Solver.Leg(offset); //offset += this.extremeties[Extremeties.ARM_RIGHT.toString()].length();
         }
         Body.prototype.evaluate = function (state) {
             var ret = this.torso.evaluate(state);
@@ -59,8 +59,8 @@ var Solver;
             return retValue;
         };
         Body.prototype.setEulersAndAccelerations = function (alpha, beta, gamma, accelX, accelY, accelZ, mode) {
-            this.head.setEulers(alpha, beta, gamma);
-            this.torso.setEulers(alpha, beta, gamma);
+            this.head.setEulers(alpha + 0.0 * gamma, beta, -0.1 * gamma);
+            this.torso.setEulers(alpha - 0.0 * gamma, beta, 0.1 * gamma);
             this.torso.setForces(accelX, accelY, accelZ);
             var sin = Math.sin(0 * alpha);
             var cos = Math.cos(0 * alpha);
@@ -69,11 +69,13 @@ var Solver;
                 case Solver.Mode.LeftTwist:
                     for (var entry in this.extremeties) {
                         if (entry == Extremeties.LEG_LEFT) {
-                            this.extremeties[Extremeties.LEG_LEFT].rotateSuspension(Math.sin(alpha + gamma), Math.cos(alpha + gamma), 0);
+                            this.extremeties[Extremeties.LEG_LEFT].pullKnee(20, Math.sin(gamma), Math.cos(gamma));
                         }
                         else
                             this.extremeties[entry].rotateSuspension(sin, cos, 0);
                     }
+                    this.extremeties[0].setInitialSuspension([-25 + 10 * gamma, 80, 50 + 25 * beta]);
+                    this.extremeties[1].setInitialSuspension([25 + 10 * gamma, 80, 50 - 25 * beta]);
                     break;
                 default:
                     for (var entry in this.extremeties) {

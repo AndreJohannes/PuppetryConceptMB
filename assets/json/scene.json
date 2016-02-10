@@ -44,9 +44,9 @@
                 "color": 16711680,
                 "intensity": 0.8,
                 "distance": 0,
-                "angle": 0.14471975511965976,
+                "angle": 0.21,
                 "decay": 1,
-                "exponent": 30
+                "exponent": 100
             },{
                 "uuid": "1A672081-0A67-4216-A331-16082F38FE74",
                 "type": "SpotLight",
@@ -56,9 +56,9 @@
                 "color": 65280,
                 "intensity": 0.8,
                 "distance": 0,
-                "angle": 0.14471975511965976,
+                "angle": 0.21,
                 "decay": 1,
-                "exponent": 30
+                "exponent": 100
             },
             {
                 "uuid": "Af67E0B4-C5A9-40C2-8EDA-F0F2F698923F",
@@ -69,9 +69,9 @@
                 "color": 255,
                 "intensity": 0.8,
                 "distance": 0,
-                "angle": 0.14471975511965976,
+                "angle": 0.21,
                 "decay": 1,
-                "exponent": 30
+                "exponent": 100
             },
              {
                 "uuid": "6A9DD607-23E8-4D24-B3E7-367635B959E1",

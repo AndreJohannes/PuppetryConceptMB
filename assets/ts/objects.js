@@ -29,6 +29,7 @@ var Objects;
     Objects.Sphere = Sphere;
     var Cylinder = (function () {
         function Cylinder(scene, height) {
+            this._angle = 0;
             //this.scene = scene;
             var cylinder = new THREE.CylinderGeometry(2.0, 2.0, height, 15, 1);
             var material = new THREE.MeshPhongMaterial({
@@ -36,8 +37,10 @@ var Objects;
             });
             this.mesh = new THREE.Mesh(cylinder, material);
             this.mesh.castShadow = true;
+            this.body = new THREE.Object3D();
+            this.body.add(this.mesh);
             this.pivot = new THREE.Object3D();
-            this.pivot.add(this.mesh);
+            this.pivot.add(this.body);
             scene.add(this.pivot);
         }
         Object.defineProperty(Cylinder.prototype, "startPoint", {
@@ -56,6 +59,17 @@ var Objects;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Cylinder.prototype, "angle", {
+            set: function (value) {
+                this._angle = value;
+                this.updatePositionAndOrientation();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Cylinder.prototype.addObject = function (object) {
+            this.body.add(object);
+        };
         Cylinder.prototype.updatePositionAndOrientation = function () {
             if (this._startPoint == null || this._endPoint == null)
                 return;
@@ -71,8 +85,8 @@ var Objects;
         };
         Cylinder.prototype.setOrientation = function (alpha, beta) {
             var orientation = new THREE.Matrix4();
-            orientation.makeRotationFromEuler(new THREE.Euler(beta, 0, -alpha, "ZYX"));
-            this.mesh.setRotationFromMatrix(orientation);
+            orientation.makeRotationFromEuler(new THREE.Euler(beta, alpha + this._angle, -alpha, "ZXY"));
+            this.body.setRotationFromMatrix(orientation);
             //console.log(beta,-alpha, this.mesh.rotation.x,this.mesh.rotation.y,this.mesh.rotation.z)
             //this.mesh.rotation.set(beta, 0, -alpha);
         };
