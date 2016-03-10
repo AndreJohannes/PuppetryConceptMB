@@ -86,12 +86,15 @@ module Solver {
                 var fy = -100 * thread[1] * Math.min((this.nominalLength.string - length) / length, 0);
                 var fz = -100 * thread[2] * Math.min((this.nominalLength.string - length) / length, 0);
             } else {
-                var f = (this.e_x * x1 + this.e_z * z1) / Math.sqrt(x1 * x1 + z1 * z1);
-                var fx = -5 * (x1 + 10 * this.e_x - 15);//-f * z1;
-                var fy = -50;//-(y1 + 20);
-                var fz = -5 * (z1 -10 * this.e_z);//f * x1;
+                var x = x1-x4;
+                var z = z1-z4;
+                var f = (this.e_x * x + this.e_z * z) / Math.sqrt(x * x + z * z);
+                var fx = -f * z;
+                var fy = -50*(y1 + 80);//-(y1 + 20);
+                var fz = f * x;
                 gx = -5 * (x2 - 15 * this.e_x - 15);
                 gz = -5 * (z2 + 15 * this.e_z);
+                gy = -20 * (y2 + 120);
             }
 
             var m11 = -2 * ((z4 - z1) ** 2 + (y4 - y1) ** 2 + (x4 - x1) ** 2);
@@ -142,6 +145,10 @@ module Solver {
             this.isTwisting = true;
         }
 
+        public stopTwist(){
+            this.isTwisting = false;    
+        }
+        
         public hasTwist(): boolean {
             return this.isTwisting;
         }

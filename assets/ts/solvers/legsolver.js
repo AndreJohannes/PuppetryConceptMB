@@ -88,12 +88,15 @@ var Solver;
                 var fz = -100 * thread[2] * Math.min((this.nominalLength.string - length) / length, 0);
             }
             else {
-                var f = (this.e_x * x1 + this.e_z * z1) / Math.sqrt(x1 * x1 + z1 * z1);
-                var fx = -5 * (x1 + 10 * this.e_x - 15); //-f * z1;
-                var fy = -50; //-(y1 + 20);
-                var fz = -5 * (z1 - 10 * this.e_z); //f * x1;
+                var x = x1 - x4;
+                var z = z1 - z4;
+                var f = (this.e_x * x + this.e_z * z) / Math.sqrt(x * x + z * z);
+                var fx = -f * z;
+                var fy = -50 * (y1 + 80); //-(y1 + 20);
+                var fz = f * x;
                 gx = -5 * (x2 - 15 * this.e_x - 15);
                 gz = -5 * (z2 + 15 * this.e_z);
+                gy = -20 * (y2 + 120);
             }
             var m11 = -2 * (Math.pow((z4 - z1), 2) + Math.pow((y4 - y1), 2) + Math.pow((x4 - x1), 2));
             var m12 = -2 * ((z2 - z1) * (z4 - z1) + (y2 - y1) * (y4 - y1) + (x2 - x1) * (x4 - x1));
@@ -131,6 +134,9 @@ var Solver;
             this.e_z = e_z;
             this.heightKnee = height;
             this.isTwisting = true;
+        };
+        Leg.prototype.stopTwist = function () {
+            this.isTwisting = false;
         };
         Leg.prototype.hasTwist = function () {
             return this.isTwisting;

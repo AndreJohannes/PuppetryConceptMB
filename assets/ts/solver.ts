@@ -15,10 +15,6 @@ module Solver {
         MoveRightArm = 8
     }
 
-    export enum Mode {
-        None,
-        LeftTwist
-    }
 
     class FallbackModel {
 
@@ -132,32 +128,10 @@ module Solver {
 
         private dt = .01;
         public solve() {
-            //return;
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
-            this.state = this.rkSolver.solve(this.state, 0.01);
+
+            for (var i = 0; i < 25; i++) {
+                this.state = this.rkSolver.solve(this.state, 0.01);
+            }
 
             this.torso.rotation.z = this.state[4];
             this.torso.rotation.x = this.state[2];
@@ -166,14 +140,14 @@ module Solver {
             this.torso.position.x = this.state[8];
             this.torso.position.z = this.state[10];
 
-            this.head.position.y = 21 + this.state[12];
+            this.head.position.y = 1 + this.state[12];
             this.head.rotation.x = this.state[2];
             this.head.rotation.y = this.state[14];
             this.head.rotation.z = this.state[16];
             this.bonesAndJoint.left_eye.centerPoint = this.bodySolver.head.locLeftEye;
             this.bonesAndJoint.right_eye.centerPoint = this.bodySolver.head.locRightEye;
 
-            var offset = 18;
+            var offset = this.bodySolver.torso.length() + this.bodySolver.head.length();
             this.bonesAndJoint.right_elbow.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.right_wrist.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
             var arm: Extremity = this.bodySolver.extremeties[Extremeties.ARM_RIGHT.toString()];
@@ -181,8 +155,8 @@ module Solver {
             this.bonesAndJoint.right_upper_arm.endPoint = this.bonesAndJoint.right_elbow.centerPoint;
             this.bonesAndJoint.right_lower_arm.startPoint = this.bonesAndJoint.right_elbow.centerPoint;
             this.bonesAndJoint.right_lower_arm.endPoint = this.bonesAndJoint.right_wrist.centerPoint;
+            offset = offset + arm.length();
 
-            offset = offset + 18;
             this.bonesAndJoint.left_elbow.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.left_wrist.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
             var arm: Extremity = this.bodySolver.extremeties[Extremeties.ARM_LEFT.toString()];
@@ -190,8 +164,8 @@ module Solver {
             this.bonesAndJoint.left_upper_arm.endPoint = this.bonesAndJoint.left_elbow.centerPoint;
             this.bonesAndJoint.left_lower_arm.startPoint = this.bonesAndJoint.left_elbow.centerPoint;
             this.bonesAndJoint.left_lower_arm.endPoint = this.bonesAndJoint.left_wrist.centerPoint;
+            offset = offset + arm.length();
 
-            offset = offset + 18;
             this.bonesAndJoint.right_knee.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.right_ankle.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
             var startPoint = this.bodySolver.extremeties[Extremeties.LEG_RIGHT.toString()].getRotatedAnchor();
@@ -200,10 +174,10 @@ module Solver {
             this.bonesAndJoint.right_thigh.endPoint = endPoint;
             this.bonesAndJoint.right_shin.startPoint = this.bonesAndJoint.right_knee.centerPoint;
             this.bonesAndJoint.right_shin.endPoint = this.bonesAndJoint.right_ankle.centerPoint;
-            var angle = Math.atan2(startPoint.x - endPoint.x, -startPoint.z + endPoint.z);
-            this.bonesAndJoint.right_shin.angle = angle-0.5;
+            var angle = .9; //Math.atan2(startPoint.x - endPoint.x, -startPoint.z + endPoint.z);
+            this.bonesAndJoint.right_shin.angle = angle - 0.5;
 
-            offset = offset + 12;
+            offset = offset + this.bodySolver.extremeties[Extremeties.LEG_RIGHT.toString()].length();
             this.bonesAndJoint.left_knee.centerPoint = new THREE.Vector3(this.state[offset], this.state[offset + 1], this.state[offset + 2]);
             this.bonesAndJoint.left_ankle.centerPoint = new THREE.Vector3(this.state[offset + 6], this.state[offset + 7], this.state[offset + 8]);
             var leg: Leg = <Leg>this.bodySolver.extremeties[Extremeties.LEG_LEFT.toString()];
@@ -213,17 +187,17 @@ module Solver {
             this.bonesAndJoint.left_thigh.endPoint = endPoint;
             this.bonesAndJoint.left_shin.startPoint = this.bonesAndJoint.left_knee.centerPoint;
             this.bonesAndJoint.left_shin.endPoint = this.bonesAndJoint.left_ankle.centerPoint;
-            var angle = (!leg.hasTwist) ? Math.atan2(startPoint.x - endPoint.x, -startPoint.z + endPoint.z) :
-                Math.atan2(-this.bonesAndJoint.left_knee.centerPoint.x + this.bonesAndJoint.left_ankle.centerPoint.x, this.bonesAndJoint.left_knee.centerPoint.z - this.bonesAndJoint.left_ankle.centerPoint.z);
+            var angle = -.9;//(!leg.hasTwist) ? .2 :
+            //Math.atan2(-this.bonesAndJoint.left_knee.centerPoint.x + this.bonesAndJoint.left_ankle.centerPoint.x, this.bonesAndJoint.left_knee.centerPoint.z - this.bonesAndJoint.left_ankle.centerPoint.z);
             this.bonesAndJoint.left_shin.angle = angle;
 
             this.time += this.dt;
 
         }
 
-        public setVolante(orientation: number[], accelerations: number[], mode: Mode) {
+        public setVolante(orientation: number[], accelerations: number[], twist: boolean, leftArm: boolean, rightArm: boolean) {
             this.bodySolver.setEulersAndAccelerations(-orientation[0], -orientation[1],
-                -orientation[2], accelerations[0], accelerations[1], orientation[3], mode);
+                -orientation[2], accelerations[0], accelerations[1], orientation[3], twist, leftArm, rightArm);
         }
 
         public openJaw() {
@@ -232,6 +206,10 @@ module Solver {
 
         public closeJaw() {
             this.jaw.position.y = 0;
+        }
+
+        public setJaw(jaw: THREE.Object3D) {
+            this.jaw = jaw;
         }
 
         public getState(): Array<number> {
@@ -247,17 +225,17 @@ module Solver {
 
         private addModel(scene: THREE.Object3D, model: FallbackModel) {
 
-            var threeZeros = [0, 0, 0];
-            this.state = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-            this.state = this.state.concat(model.right_arm.elbow).concat(threeZeros).concat(model.right_arm.wrist).concat(threeZeros).concat(model.right_arm.suspension).concat(threeZeros);
-            this.state = this.state.concat(model.left_arm.elbow).concat(threeZeros).concat(model.left_arm.wrist).concat(threeZeros).concat(model.left_arm.suspension).concat(threeZeros);
+            var threeZeros = this.createZeroArray(3);
+            this.state = this.createZeroArray(this.bodySolver.head.length()+this.bodySolver.torso.length());
+            this.state = this.state.concat(model.right_arm.elbow).concat(threeZeros).concat(model.right_arm.wrist).concat(threeZeros);
+            this.state = this.state.concat(model.left_arm.elbow).concat(threeZeros).concat(model.left_arm.wrist).concat(threeZeros);
             this.state = this.state.concat(model.right_leg.knee).concat(threeZeros).concat(model.right_leg.ankle).concat(threeZeros);
             this.state = this.state.concat(model.left_leg.knee).concat(threeZeros).concat(model.left_leg.ankle).concat(threeZeros);
 
             this.bodySolver.setInitialSuspension(Extremeties.ARM_RIGHT, [-25, 80, 60]);
-            this.bodySolver.setInitialSuspension(Extremeties.ARM_LEFT, [25, 80, 60]);
-            this.bodySolver.setInitialSuspension(Extremeties.LEG_RIGHT, [-65, 90, 15]);
-            this.bodySolver.setInitialSuspension(Extremeties.LEG_LEFT, [65, 90, 15]);
+            this.bodySolver.setInitialSuspension(Extremeties.ARM_LEFT, [25, 60, 60]);
+            this.bodySolver.setInitialSuspension(Extremeties.LEG_RIGHT, [-65, 80, 15]);
+            this.bodySolver.setInitialSuspension(Extremeties.LEG_LEFT, [65, 80, 15]);
 
             this.bodySolver.setInitialAnchor(Extremeties.ARM_RIGHT, model.body.right_shoulder);
             this.bodySolver.setInitialAnchor(Extremeties.ARM_LEFT, model.body.left_shoulder);
@@ -273,7 +251,7 @@ module Solver {
             this.torso = new THREE.Object3D(); this.body.add(this.torso); this.torso.rotation.order = 'YXZ';// Means Y last
             this.head = new THREE.Object3D(); this.torso.add(this.head); this.head.rotation.order = 'ZYX';
             this.bonesAndJoint = new BonesAndJoints();
-            this.loadTorso(this.torso, this.head, this);
+            Loader.Loader.loadTorso(this.torso, this.head, this);
 
             this.bonesAndJoint.left_eye = new Objects.Sphere(this.head, 0);
             this.bonesAndJoint.right_eye = new Objects.Sphere(this.head, 0);
@@ -291,7 +269,7 @@ module Solver {
             this.bonesAndJoint.left_lower_arm = new Objects.Cylinder(this.body, this.distance(model.left_arm.wrist, model.left_arm.elbow));
             this.bonesAndJoint.left_lower_arm.startPoint = this.bonesAndJoint.left_wrist.centerPoint;
             this.bonesAndJoint.left_lower_arm.endPoint = this.bonesAndJoint.left_elbow.centerPoint;
-            this.loadLeftHand(this.bonesAndJoint.left_lower_arm, this);
+            Loader.Loader.loadLeftHand(this.bonesAndJoint.left_lower_arm, this);
 
             this.bonesAndJoint.right_elbow = new Objects.Sphere(this.body);
             this.bonesAndJoint.right_elbow.centerPoint = new THREE.Vector3(model.right_arm.elbow[0], model.right_arm.elbow[1], model.right_arm.elbow[2]);
@@ -304,7 +282,7 @@ module Solver {
             this.bonesAndJoint.right_lower_arm = new Objects.Cylinder(this.body, this.distance(model.right_arm.wrist, model.right_arm.elbow));
             this.bonesAndJoint.right_lower_arm.startPoint = this.bonesAndJoint.right_wrist.centerPoint;
             this.bonesAndJoint.right_lower_arm.endPoint = this.bonesAndJoint.right_elbow.centerPoint;
-            this.loadRightHand(this.bonesAndJoint.right_lower_arm, this);
+            Loader.Loader.loadRightHand(this.bonesAndJoint.right_lower_arm, this);
 
             this.bonesAndJoint.left_knee = new Objects.Sphere(this.body);
             this.bonesAndJoint.left_knee.centerPoint = new THREE.Vector3(model.left_leg.knee[0], model.left_leg.knee[1], model.left_leg.knee[2]);
@@ -317,7 +295,7 @@ module Solver {
             this.bonesAndJoint.left_shin = new Objects.Cylinder(this.body, this.distance(model.left_leg.knee, model.left_leg.ankle));
             this.bonesAndJoint.left_shin.startPoint = this.bonesAndJoint.left_ankle.centerPoint;
             this.bonesAndJoint.left_shin.endPoint = this.bonesAndJoint.left_knee.centerPoint;
-            this.loadLeftBoot(this.bonesAndJoint.left_shin, this);
+            Loader.Loader.loadLeftBoot(this.bonesAndJoint.left_shin, this);
 
             this.bonesAndJoint.right_knee = new Objects.Sphere(this.body);
             this.bonesAndJoint.right_knee.centerPoint = new THREE.Vector3(model.right_leg.knee[0], model.right_leg.knee[1], model.right_leg.knee[2]);
@@ -331,7 +309,7 @@ module Solver {
             this.bonesAndJoint.right_shin = new Objects.Cylinder(this.body, this.distance(model.right_leg.knee, model.right_leg.ankle));
             this.bonesAndJoint.right_shin.startPoint = this.bonesAndJoint.right_ankle.centerPoint;
             this.bonesAndJoint.right_shin.endPoint = this.bonesAndJoint.right_knee.centerPoint;
-            this.loadRightBoot(this.bonesAndJoint.right_shin, this);
+            Loader.Loader.loadRightBoot(this.bonesAndJoint.right_shin, this);
 
         }
 
@@ -343,118 +321,12 @@ module Solver {
             return Math.sqrt(distSqr);
         }
 
-        private loadTorso(torso: THREE.Object3D, head: THREE.Object3D, that: Solver) {
-            var loader: THREE.JSONLoader = new THREE.JSONLoader();
-            loader.load("json/evilskull/skull.json", function(geometry, material) {
-                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                mesh.scale.x = 20;
-                mesh.scale.y = 18;
-                mesh.scale.z = 18;
-                mesh.castShadow = true;
-                //head.translateY(47);
-                head.add(mesh);
-            });
-            loader.load("json/evilskull/jaw.json", function(geometry, material) {
-                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                mesh.scale.x = 20;
-                mesh.scale.y = 18;
-                mesh.scale.z = 18;
-                //mesh.translateY(87);
-                mesh.name = "jaw";
-                that.jaw = mesh;
-                head.add(mesh);
-            });
-            loader.load("json/cartoonskeleton/torso.json", function(geometry, material) {
-                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                var scale = 25;
-                mesh.scale.x = scale;
-                mesh.scale.y = scale;
-                mesh.scale.z = scale;
-                mesh.castShadow = true;
-                mesh.translateZ(0.32108 * scale);
-                mesh.translateY(0.49917 * scale - 40);
-                torso.add(mesh);
-            });
+        private createZeroArray(n:number){
+            var retArray = [];    
+            for(var i=0;i<n;i++)
+                retArray.push(0);    
+            return retArray;
         }
-
-        private loadRightHand(arm: Objects.Cylinder, that: Solver) {
-            var loader: THREE.JSONLoader = new THREE.JSONLoader();
-            loader.load("json/righthand.json", function(geometry, material) {
-                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                var scale = 1.3;
-                mesh.scale.x = scale;
-                mesh.scale.y = scale;
-                mesh.scale.z = scale;
-                mesh.castShadow = true;
-                var object: THREE.Object3D = new THREE.Object3D();
-                object.translateY(45. / 2.);
-                //object.translateX(-25);
-                //object.translateY(-20);
-                object.add(mesh);
-                mesh.rotateX(3.14159 / 2);
-                mesh.rotateZ(3.14159 / 3.);
-                arm.addObject(object);
-            });
-        }
-
-        private loadLeftHand(arm: Objects.Cylinder, that: Solver) {
-            var loader: THREE.JSONLoader = new THREE.JSONLoader();
-            loader.load("json/lefthand.json", function(geometry, material) {
-                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                var scale = 1.3;
-                mesh.scale.x = scale;
-                mesh.scale.y = scale;
-                mesh.scale.z = scale;
-                mesh.castShadow = true;
-                var object: THREE.Object3D = new THREE.Object3D();
-                object.translateY(45 / 2.);
-                //object.translateX(25);
-                //object.translateY(-20);
-                object.add(mesh);
-                mesh.rotateX(3.14159 / 2.);
-                mesh.rotateZ(-3.14159 / 3.);
-                arm.addObject(object);
-            });
-        }
-
-        private loadRightBoot(arm: Objects.Cylinder, that: Solver) {
-            var loader: THREE.JSONLoader = new THREE.JSONLoader();
-            loader.load("json/rightboot.json", function(geometry, material) {
-                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                var scale = 22;
-                mesh.scale.x = scale;
-                mesh.scale.y = scale;
-                mesh.scale.z = scale;
-                mesh.castShadow = true;
-                var object: THREE.Object3D = new THREE.Object3D();
-                object.translateY(55. / 2.);
-                object.translateZ(-9);
-                //object.translateY(-20);
-                object.add(mesh);
-                mesh.rotateZ(3.14159);
-                mesh.rotateY(3.14159);
-                arm.addObject(object);
-            });
-        }
-
-        private loadLeftBoot(arm: Objects.Cylinder, that: Solver) {
-            var loader: THREE.JSONLoader = new THREE.JSONLoader();
-            loader.load("json/leftboot.json", function(geometry, material) {
-                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xffffff }));
-                var scale = 22;
-                mesh.scale.x = scale;
-                mesh.scale.y = scale;
-                mesh.scale.z = scale;
-                mesh.castShadow = true;
-                var object: THREE.Object3D = new THREE.Object3D();
-                object.translateY(55. / 2.);
-                object.translateZ(-9);
-                //object.translateY(-20);
-                object.add(mesh);
-                mesh.rotateZ(3.14159);
-                mesh.rotateY(3.14159);
-                arm.addObject(object);
-            });
-        }
+        
     }
 }

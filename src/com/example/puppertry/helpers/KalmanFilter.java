@@ -214,6 +214,10 @@ public class KalmanFilter {
 	public Vector getCurrentState() {
 		return x;
 	}
+	
+	public void setCurrentState(int i, double value){
+		x.setValue(i, value);
+	}
 
 	public void setR(Matrix R) {
 		this.R = R;
@@ -225,12 +229,12 @@ public class KalmanFilter {
 		Matrix P_predicted = A.multiply(P).multiply(A.transpose()).add(Q);
 
 		Vector y = z.sub(H.multiply(x_predicted));
-
 		Matrix S = H.multiply(P_predicted).multiply(H.transpose()).add(R);
 		Matrix K = P_predicted.multiply(H.transpose()).multiply(S.inverse());
 
 		x = x_predicted.add(K.multiply(y));
 		P = (Matrix.eye(K.m).sub(K.multiply(H))).multiply(P_predicted);
+		
 		return x;
 	}
 

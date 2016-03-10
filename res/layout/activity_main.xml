@@ -17,13 +17,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
 
-            <Button
+            <ToggleButton
                 android:id="@+id/btnId1"
-                android:layout_width="fill_parent"
+                                android:layout_width="fill_parent"
                 android:layout_height="90dp"
+                android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
-                android:text="Move LA"
+                android:textOff="Move LA"
+                android:textOn="Move LA"
+                android:textSize="20sp"
        		 />
 
             <Button
@@ -34,13 +37,16 @@
                 android:background="@drawable/gradient"
                 android:text="Drop Jaw" />
 
-            <Button
+            <ToggleButton
                 android:id="@+id/btnId3"
                 android:layout_width="fill_parent"
                 android:layout_height="90dp"
+                android:layout_marginTop="1dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
-                android:text="Move RA" />
+                android:textOff="Move RA"
+                android:textOn="Move RA"
+                android:textSize="20sp" />
         </TableRow>
 
         <TableRow
@@ -64,7 +70,7 @@
                 android:layout_height="90dp"
                 android:layout_weight="1"
                 android:background="@drawable/gradient"
-                android:text="Not Used" />
+                android:text="Tap" />
 
             <ToggleButton
                 android:id="@+id/btnId6"

@@ -37,11 +37,14 @@ public class ButtonsController {
 		final ToggleButton musicToggler = (ToggleButton) activity.findViewById(R.id.btnId8);
 		musicToggler.setOnCheckedChangeListener(getAudioListener());
 
-		final Button leftHandMove = (Button) activity.findViewById(R.id.btnId1);
-		leftHandMove.setOnTouchListener(getMoveLeftArmListener());
+		final ToggleButton leftHandMove = (ToggleButton) activity.findViewById(R.id.btnId1);
+		leftHandMove.setOnCheckedChangeListener(getMoveLeftArmListener());
 
-		final Button rightHandMove = (Button) activity.findViewById(R.id.btnId3);
-		rightHandMove.setOnTouchListener(getMoveRightArmListener());
+		final ToggleButton rightHandMove = (ToggleButton) activity.findViewById(R.id.btnId3);
+		rightHandMove.setOnCheckedChangeListener(getMoveRightArmListener());
+		
+		final Button tapButton = (Button) activity.findViewById(R.id.btnId5);
+		tapButton.setOnTouchListener(getTapListener());
 		
 		final SeekBar hightSlider = (SeekBar) activity.findViewById(R.id.seekBar1);
 		hightSlider.setOnSeekBarChangeListener(getHightSliderListener());
@@ -91,6 +94,28 @@ public class ButtonsController {
 		};
 	}
 
+	
+	private View.OnTouchListener getTapListener() {
+		return new View.OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View yourButton, MotionEvent theMotion) {
+				switch (theMotion.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					commandDispatcher.setCommand(Commands.LiftFood);
+					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
+					break;
+				case MotionEvent.ACTION_UP:
+					commandDispatcher.setCommand(Commands.TapFood);
+					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
+					break;
+				}
+				return true;
+			}
+		};
+	}
+	
+	
 	private CompoundButton.OnCheckedChangeListener getLeftLegTwisterListener() {
 		return new CompoundButton.OnCheckedChangeListener() {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -119,42 +144,34 @@ public class ButtonsController {
 		};
 	}
 
-	private View.OnTouchListener getMoveRightArmListener() {
-		return new View.OnTouchListener() {
+	private CompoundButton.OnCheckedChangeListener getMoveRightArmListener() {
+		return new CompoundButton.OnCheckedChangeListener() {
 
 			@Override
-			public boolean onTouch(View yourButton, MotionEvent theMotion) {
-				switch (theMotion.getAction()) {
-				case MotionEvent.ACTION_DOWN:
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
 					commandDispatcher.setCommand(Commands.MoveRightArm);
-					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
-					break;
-				case MotionEvent.ACTION_UP:
+					buttonView.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
+				} else {
 					commandDispatcher.clearCommand(Commands.MoveRightArm);
-					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
-					break;
+					buttonView.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
 				}
-				return true;
 			}
 		};
 	}
 	
-	private View.OnTouchListener getMoveLeftArmListener() {
-		return new View.OnTouchListener() {
+	private CompoundButton.OnCheckedChangeListener getMoveLeftArmListener() {
+		return new CompoundButton.OnCheckedChangeListener()  {
 
 			@Override
-			public boolean onTouch(View yourButton, MotionEvent theMotion) {
-				switch (theMotion.getAction()) {
-				case MotionEvent.ACTION_DOWN:
+			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				if (isChecked) {
 					commandDispatcher.setCommand(Commands.MoveLeftArm);
-					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
-					break;
-				case MotionEvent.ACTION_UP:
+					buttonView.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient_clicked));
+				} else {
 					commandDispatcher.clearCommand(Commands.MoveLeftArm);
-					yourButton.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
-					break;
+					buttonView.setBackgroundDrawable(activity.getResources().getDrawable(R.drawable.gradient));
 				}
-				return true;
 			}
 		};
 	}

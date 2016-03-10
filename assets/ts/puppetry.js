@@ -6,7 +6,6 @@
 var Render = (function () {
     function Render() {
         this.solver = { "solve": function () { } };
-        this.volante = new THREE.Object3D();
         this.cylinders = new Array();
         this.spheres = new Array();
         this.body = new THREE.Object3D();
@@ -29,18 +28,18 @@ var Render = (function () {
             stage.material = new THREE.MeshPhongMaterial({ color: 0xffffff, map: texture });
             that.stage.add(obj);
             that.lighting = new Lighting.Lighting(that.scene);
-            (new THREE.ObjectLoader).load('json/volante.json', function (obj) {
-                that.volante.add(obj);
+            (new THREE.JSONLoader).load('json/micro.json', function (geometry, material) {
+                var mesh = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({ color: 0xaaaaaa }));
+                mesh.scale.x = 120;
+                mesh.scale.y = 120;
+                mesh.scale.z = 120;
+                mesh.rotateY(Math.PI / 2);
+                mesh.translateY(140);
+                mesh.translateX(-60);
+                that.stage.add(mesh);
                 //that.scene.add(obj);
-                obj.rotation.order = "YZX";
+                //obj.rotation.order = "YZX";
                 that.solver = new Solver.Solver(that.body);
-                //window.animate = function(that, solver: Solver.Solver, time: number) {
-                //    return function() {
-                //        solver.setVolante([0, 0, Math.sin(time / 150), 0], [0, 0, 0], Solver.Mode.LeftTwist);
-                //        setTimeout(that.animate(that, solver, time + 17), 17);
-                //    }
-                //}
-                //window.animate(this, <Solver.Solver>that.solver, 0)();
             });
         });
         this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -84,16 +83,16 @@ window.onload = function () {
     this.render.animate();
     var render = this.render;
     var audio = new Audio("music/twist.mp3");
-    var connection = new WebSocket('ws://' + window.location.hostname + ':9090', [
+    //var connection = new WebSocket('ws://' + window.location.hostname + ':9090', [
+    var connection = new WebSocket('ws://192.168.1.6:9090', [
         'soap', 'xmpp']);
     connection.onmessage = function (e) {
         var data = JSON.parse(e.data);
         //render.solver.setVolante(data.ort);
-        render.volante.rotation.y = -data.ort[0];
-        render.volante.rotation.x = -data.ort[1];
-        render.volante.rotation.z = -data.ort[2];
         var solver = (render.solver);
-        var mode = Solver.Mode.None;
+        var twist = false;
+        var leftArm = false;
+        var rightArm = false;
         for (var _i = 0, _a = data.cmds; _i < _a.length; _i++) {
             var command = _a[_i];
             switch (command) {
@@ -104,7 +103,7 @@ window.onload = function () {
                     solver.closeJaw();
                     break;
                 case Solver.Commands.LeftLegTwist:
-                    mode = Solver.Mode.LeftTwist;
+                    twist = true;
                     break;
                 case Solver.Commands.PlayAudio:
                     audio.src = "music/twist.mp3";
@@ -115,11 +114,13 @@ window.onload = function () {
                     audio.src = "music/twist.mp3";
                     break;
                 case Solver.Commands.MoveLeftArm:
+                    leftArm = true;
                     break;
                 case Solver.Commands.MoveRightArm:
+                    rightArm = true;
                     break;
             }
         }
-        solver.setVolante(data.ort, data.acc, mode);
+        solver.setVolante(data.ort, data.acc, twist, leftArm, rightArm);
     };
 };

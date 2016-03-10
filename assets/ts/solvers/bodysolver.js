@@ -58,39 +58,36 @@ var Solver;
             }
             return retValue;
         };
-        Body.prototype.setEulersAndAccelerations = function (alpha, beta, gamma, accelX, accelY, accelZ, mode) {
-            this.head.setEulers(alpha + 0.0 * gamma, beta, -0.1 * gamma);
-            this.torso.setEulers(alpha - 0.0 * gamma, beta, 0.1 * gamma);
+        Body.prototype.setEulersAndAccelerations = function (alpha, beta, gamma, 
+            // TODO: very experimental, clean up 
+            accelX, accelY, accelZ, twist, moveLA, moveRA) {
+            this.head.setEulers(alpha + 0.0 * gamma, -beta, -gamma);
+            if (twist)
+                this.torso.setEulers(0.1 * alpha - 0.0 * gamma, 0 * beta, 0 * gamma);
+            else
+                this.torso.setEulers(0.1 * alpha - 0.0 * gamma, 1 * beta, 1 * gamma);
             this.torso.setForces(accelX, accelY, accelZ);
             var sin = Math.sin(0 * alpha);
             var cos = Math.cos(0 * alpha);
             var tilt = Math.sin(gamma);
-            switch (mode) {
-                case Solver.Mode.LeftTwist:
-                    for (var entry in this.extremeties) {
-                        if (entry == Extremeties.LEG_LEFT) {
-                            this.extremeties[Extremeties.LEG_LEFT].pullKnee(20, Math.sin(gamma), Math.cos(gamma));
-                        }
-                        else
-                            this.extremeties[entry].rotateSuspension(sin, cos, 0);
-                    }
-                    this.extremeties[0].setInitialSuspension([-25 + 10 * gamma, 80, 50 + 25 * beta]);
-                    this.extremeties[1].setInitialSuspension([25 + 10 * gamma, 80, 50 - 25 * beta]);
-                    break;
-                default:
-                    for (var entry in this.extremeties) {
-                        var height = 0;
-                        if (entry == Extremeties.ARM_RIGHT)
-                            height = 50 * tilt;
-                        if (entry == Extremeties.ARM_LEFT)
-                            height = 50 * tilt;
-                        //if (entry == Extremeties.LEG_RIGHT)
-                        //    height = Math.max(-30 * tilt, 0);
-                        //if (entry == Extremeties.LEG_LEFT)
-                        //    height = Math.max(30 * tilt, 0);
-                        this.extremeties[entry].rotateSuspension(sin, cos, height);
-                    }
+            var leftLeg = this.extremeties[Extremeties.LEG_LEFT];
+            var leftArm = this.extremeties[Extremeties.ARM_LEFT];
+            var rightArm = this.extremeties[Extremeties.ARM_RIGHT];
+            if (twist)
+                leftLeg.pullKnee(60, Math.sin(3 * gamma + 1.5), Math.cos(3 * gamma + 1.5));
+            else
+                leftLeg.stopTwist();
+            leftArm.setArm(moveLA);
+            rightArm.setArm(moveRA);
+            if (!moveLA) {
+                var height = 50 * tilt;
+                leftArm.rotateSuspension(sin, cos, height);
             }
+            if (!moveRA) {
+                var height = 50 * tilt;
+                rightArm.rotateSuspension(sin, cos, height);
+            }
+            //}
         };
         Body.prototype.setInitialSuspension = function (extremity, point) {
             this.extremeties[extremity.toString()].setInitialSuspension(point);
